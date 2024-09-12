@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "Don Cheadle Code",
+    "description": "Practice for creating chrome extensions",
+    "version": "1.0",
+    "action": {
+      "default_popup": "hello.html",
+      "default_icon": "doncheadlehell.png"
+    },
+    "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+    }
+}
+
+icons will need to be added for release
