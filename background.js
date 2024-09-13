@@ -21,12 +21,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     });
 
     if (nextState === 'ON') {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['addDiv.js'],
-      }, () => {
-        chrome.tabs.sendMessage(tab.id, { action: 'addDiv' });
-      });
+      chrome.tabs.sendMessage(tab.id, { action: 'addDiv' });
     } else if (nextState === 'OFF') {
       chrome.tabs.sendMessage(tab.id, { action: 'removeDiv' });
     }

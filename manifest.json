@@ -19,7 +19,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["overlay.html"],
+        "resources": ["overlay.html", "catsitting.png"],
         "matches": ["<all_urls>"]
       }
     ]
