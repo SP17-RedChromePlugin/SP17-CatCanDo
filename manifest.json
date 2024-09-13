@@ -1,20 +1,26 @@
 {
     "manifest_version": 3,
-    "name": "Don Cheadle Code",
-    "description": "Practice for creating chrome extensions",
+    "name": "Test Extension",
+    "description": "Extension for learning how to build extensions",
     "version": "1.0",
+    "permissions": ["tabs", "activeTab", "scripting"],
     "action": {
-      "default_popup": "hello.html",
-      "default_icon": "doncheadlehell.png"
+      "default_icon": "logo.png"
+    },
+
+    "background": {
+    "service_worker": "background.js"
     },
     "content_scripts": [
     {
-      "js": ["scripts/content.js"],
-      "matches": [
-        "https://developer.chrome.com/docs/extensions/*",
-        "https://developer.chrome.com/docs/webstore/*"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["addDiv.js"]
     }
-  ]
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["overlay.html"],
+        "matches": ["<all_urls>"]
+      }
+    ]
 }
-  
