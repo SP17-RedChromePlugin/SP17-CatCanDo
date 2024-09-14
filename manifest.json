@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Test Extension",
-    "description": "Extension for learning how to build extensions",
+    "name": "CatCanDo",
+    "description": "Browser pet that helps manages your time on the web!",
     "version": "1.0",
     "permissions": ["tabs", "activeTab", "scripting"],
     "action": {
