@@ -14,7 +14,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           document.body.appendChild(div.firstElementChild); // Append the actual div element
 
           const img = document.getElementById('catImage'); //getting and setting image of the cat
-          img.src = chrome.runtime.getURL('catsitting.png');
+          img.src = chrome.runtime.getURL('images/catsitting.png');
+          img.addEventListener('click', toggleMenu);
         })
         .catch(err => console.error('Error loading overlay:', err));
       }
@@ -25,3 +26,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     }
   });
+
+  function toggleMenu() {
+    const menu = document.getElementById('catMenu');
+    if (menu) {
+      if (menu.style.display === 'none') { menu.style.display = 'block'} //toggles visibility based on current visibility
+      else { menu.style.display = 'none'}
+    }
+  }
