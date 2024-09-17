@@ -13,9 +13,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           div.innerHTML = html;
           document.body.appendChild(div.firstElementChild); // Append the actual div element
 
+          // Image and click event set-up:
           const img = document.getElementById('catImage'); //getting and setting image of the cat
           img.src = chrome.runtime.getURL('images/catsitting.png');
           img.addEventListener('click', toggleMenu);
+
+          const settingButton = document.getElementById('settingsButton');
+          settingButton.src = chrome.runtime.getURL('images/settingButton1.png');
+          settingButton.addEventListener('click', settingsMenu);
+
+          const calendarButton = document.getElementById('calendarButton');
+          calendarButton.src = chrome.runtime.getURL('images/calenderButton1.png');
+          calendarButton.addEventListener('click', calendarMenu);
         })
         .catch(err => console.error('Error loading overlay:', err));
       }
@@ -33,4 +42,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (menu.style.display === 'none') { menu.style.display = 'block'} //toggles visibility based on current visibility
       else { menu.style.display = 'none'}
     }
+  }
+
+  function settingsMenu() {
+    console.log("Settings clicked!");
+  }
+
+  function calendarMenu() {
+    console.log("Calendar clicked!");
   }

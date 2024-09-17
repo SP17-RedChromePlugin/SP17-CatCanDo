@@ -8,7 +8,7 @@ const extension = 'https://'
 
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
-  if (tab.url.startsWith(extension)) {
+  if (tab.url.startsWith(extension) && !tab.url.startsWith("chrome://")) {
     // We retrieve the action badge to check if the extension is 'ON' or 'OFF'
     const prevState = await chrome.action.getBadgeText({ tabId: tab.id });
     // Next state will always be the opposite
