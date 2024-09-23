@@ -25,6 +25,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const calendarButton = document.getElementById('calendarButton');
           calendarButton.src = chrome.runtime.getURL('images/calenderButton1.png');
           calendarButton.addEventListener('click', calendarMenu);
+
+          const settingsMenuDiv = document.getElementById('settingsMenu');
+          settingsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
         })
         .catch(err => console.error('Error loading overlay:', err));
       }
@@ -38,15 +41,59 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   function toggleMenu() {
     const menu = document.getElementById('catMenu');
+    const settingsMenu = document.getElementById('settingsMenu');
     if (menu) {
-      if (menu.style.display === 'none') { menu.style.display = 'block'} //toggles visibility based on current visibility
+      if (menu.style.display === 'none') { menu.style.display = 'block';} //toggles visibility based on current visibility
       else { menu.style.display = 'none'}
+      if (settingsMenu) {
+        settingsMenu.style.display = 'none';
+      }
     }
   }
 
+  let animationInterval = null;
   function settingsMenu() {
-    console.log("Settings clicked!");
-    chrome.runtime.sendMessage({ action: "openSettings" });
+    const menu = document.getElementById('settingsMenu');
+    if (menu) {
+      if (menu.style.display === 'none') { 
+
+        if (animationInterval) {
+          clearInterval(animationInterval);
+        }
+
+        let positionY = 400;
+        var delta = 10;
+        const initialPos = positionY;
+        const initialDelta = delta;
+        const rateOfDecay = 1 / (1 - (initialDelta/initialPos));
+        menu.style.backgroundPosition = `center ${positionY}px`;
+        menu.style.display = 'block';
+
+        animationInterval = setInterval(() => {
+          positionY -= delta;
+          delta /= rateOfDecay;
+          
+          // Apply the updated background position
+          menu.style.backgroundPosition = `center ${positionY}px`;
+          
+          // Stop the animation once the background reaches the center (0px)
+          if (positionY <= 0.2) {
+            console.log("closing");
+            menu.style.backgroundPosition = `center 0px`;
+            if (animationInterval) {
+              clearInterval(animationInterval);
+            }
+          }
+        }, 4);  // Interval speed in ms
+      }
+      else { 
+        if (animationInterval) {
+          clearInterval(animationInterval);
+          animationInterval = null;  // Reset interval ID
+        }
+        menu.style.display = 'none';
+      }
+    }
   }
 
   function calendarMenu() {
