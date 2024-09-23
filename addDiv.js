@@ -46,6 +46,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   function settingsMenu() {
     console.log("Settings clicked!");
+    chrome.runtime.sendMessage({ action: "openSettings" });
   }
 
   function calendarMenu() {
