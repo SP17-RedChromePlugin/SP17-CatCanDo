@@ -78,13 +78,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           
           // Stop the animation once the background reaches the center (0px)
           if (positionY <= 0.2) {
-            console.log("closing");
             menu.style.backgroundPosition = `center 0px`;
             if (animationInterval) {
               clearInterval(animationInterval);
             }
           }
-        }, 4);  // Interval speed in ms
+        }, 3);  // Interval speed in ms
       }
       else { 
         if (animationInterval) {
