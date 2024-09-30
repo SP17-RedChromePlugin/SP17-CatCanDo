@@ -27,10 +27,3 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   }
 });
-
-/*//When the user clicks on the settings button
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "openSettings") {
-    chrome.tabs.create({ url: chrome.runtime.getURL('settings.html') });
-  }
-});*/

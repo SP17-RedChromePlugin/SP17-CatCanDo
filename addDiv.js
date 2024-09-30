@@ -1,9 +1,12 @@
 // Listen for messages from the background script
+let stateChangeTimeout = null;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-
     if (message.action === 'addDiv') {
-      // Create a div with full-screen overlay
+
+      //Cat state deciding loop
+      executeStateChange();
       
+            // Create a div with full-screen overlay
       const existingDiv = document.getElementById('overlayDiv')
       if (!existingDiv) {
         fetch(chrome.runtime.getURL('overlay.html'))
@@ -33,6 +36,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     } else if (message.action === 'removeDiv') {
       const div = document.getElementById('overlayDiv');
+      clearTimeout(stateChangeTimeout);
       if (div) {
         div.remove();
       }
@@ -99,5 +103,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   function calendarMenu() {
-    console.log("Calendar clicked!");
+    console.log("Calendar clicked!!!!");
+  }
+
+  function executeStateChange() {
+    let randomDelay = Math.floor(Math.random() * 20000) + 10000;
+  
+    stateChangeTimeout = setTimeout(() => {
+      // Generate a new state (0, 1, or 2)
+      let newState = Math.floor(Math.random() * 3);
+      
+      switch (newState) {
+        case 0:
+          sleepState();
+          break;
+        case 1:
+          walkState();
+          break;
+        case 2:
+          sitState();
+          break;
+      }
+  
+      //recursively call the function
+      executeStateChange();
+      
+    }, randomDelay);
+  }
+
+  // Cat States
+  function sleepState() {
+    console.log("Cat is sleeping... Zzz...");
+  }
+
+  function walkState() {
+    console.log("Cat is walking!");
+  }
+
+  function sitState() {
+    console.log("Cat is sitting.");
   }
