@@ -54,6 +54,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   let animationInterval = null;
   function settingsMenu() {
     const menu = document.getElementById('settingsMenu');
+    const settingInterior = document.getElementById('settingsInterior');
     if (menu) {
       if (menu.style.display === 'none') { 
 
@@ -68,6 +69,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const rateOfDecay = 1 / (1 - (initialDelta/initialPos));
         menu.style.backgroundPosition = `center ${positionY}px`;
         menu.style.display = 'block';
+        settingInterior.style.display = 'none';
 
         animationInterval = setInterval(() => {
           positionY -= delta;
@@ -77,8 +79,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           menu.style.backgroundPosition = `center ${positionY}px`;
           
           // Stop the animation once the background reaches the center (0px)
-          if (positionY <= 0.2) {
+          if (positionY <= 2) {
             menu.style.backgroundPosition = `center 0px`;
+            settingInterior.style.display = 'block';
             if (animationInterval) {
               clearInterval(animationInterval);
             }
