@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       //Cat state deciding loop
       executeStateChange();
       
-            // Create a div with full-screen overlay
+      // Create a div with full-screen overlay
       const existingDiv = document.getElementById('overlayDiv')
       if (!existingDiv) {
         fetch(chrome.runtime.getURL('overlay.html'))

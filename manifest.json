@@ -3,7 +3,7 @@
     "name": "CatCanDo",
     "description": "Browser pet that helps manages your time on the web!",
     "version": "1.0",
-    "permissions": ["tabs", "activeTab", "scripting"],
+    "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
     "action": {
       "default_icon": "images/logo.png"
     },

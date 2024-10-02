@@ -9,12 +9,12 @@ const extension = 'https://'
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
   if (tab.url.startsWith(extension) && !tab.url.startsWith("chrome://")) {
-    // We retrieve the action badge to check if the extension is 'ON' or 'OFF'
+    //retrieve the action badge to check if the extension is 'ON' or 'OFF'
     const prevState = await chrome.action.getBadgeText({ tabId: tab.id });
-    // Next state will always be the opposite
+    // next state will always be the opposite
     const nextState = prevState === 'ON' ? 'OFF' : 'ON';
 
-    // Set the action badge to the next state
+    //set the action badge to the next state
     await chrome.action.setBadgeText({
       tabId: tab.id,
       text: nextState
@@ -25,5 +25,79 @@ chrome.action.onClicked.addListener(async (tab) => {
     } else if (nextState === 'OFF') {
       chrome.tabs.sendMessage(tab.id, { action: 'removeDiv' });
     }
+  }
+});
+
+/*
+---Time tracking---
+*/
+
+let activeURL = null;
+let timeSpent = {};
+let tabDomains = {}; // Store tab domain information
+let tabStartTimes = {}; //Stores time that the tab was opened
+let totalTime = {}; //Stores total time spent on a website
+
+//listen for window focus change
+chrome.windows.onFocusChanged.addListener(windowId => {
+  if (windowId === chrome.windows.WINDOW_ID_NONE) {
+      console.log("User is inactive");
+  } else {
+    console.log("User is back.")
+  }
+});
+
+// Detect navigation
+chrome.webNavigation.onCompleted.addListener(function(details) {
+  if (details.frameId === 0) {  // Main frame only
+    chrome.tabs.get(details.tabId, function(tab) {
+        // Extract the hostname from the URL
+        let url = new URL(tab.url);
+        let domain = url.hostname;
+
+        // Log the website domain
+        tabDomains[details.tabId] = domain;
+        tabStartTimes[details.tabId] = new Date();
+        console.log("New website opened:", domain);
+        console.log("Website opened at: ", tabStartTimes[details.tabId]);
+    });
+  }
+});
+
+//When a tab is updated, like moving to a new page
+chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
+  if (details.frameId === 0) {
+    let currentDomain = tabDomains[details.tabId]; // Get the current domain for this tab
+    let newUrl = new URL(details.url);
+    let newDomain = newUrl.hostname;
+
+    if (currentDomain !== newDomain && currentDomain) {
+      console.log("Domain changed from:", currentDomain, "to:", newDomain);
+      let currentDate = new Date();
+      let dateDifference = currentDate - tabStartTimes[details.tabId];
+      if (totalTime[currentDomain] == null) {
+        totalTime[currentDomain] = 0;
+      }
+      totalTime[currentDomain] += dateDifference / (1000); //converting milliseconds to seconds
+      tabDomains[details.tabId] = newDomain;
+      tabStartTimes[details.tabId] = currentDate;
+      console.log("Time spent on that website: ", totalTime[currentDomain]);
+    }
+  }
+});
+
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+  let domain = tabDomains[tabId]; // Get the stored domain for the closed tab
+  if (domain) {
+    console.log("Tab closed:", domain);
+    let currentDate = new Date();
+    let dateDifference = currentDate - tabStartTimes[tabId];
+    if (totalTime[domain] == null) {
+      totalTime[domain] = 0;
+    }
+    totalTime[domain] += dateDifference / (1000); //converting milliseconds to seconds
+    console.log("Time spent on that website: ", totalTime[domain]);
+    delete tabDomains[tabId]; // Clean up the stored info
+    delete tabStartTimes[tabId];
   }
 });
