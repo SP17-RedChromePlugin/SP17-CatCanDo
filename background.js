@@ -99,5 +99,30 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
     console.log("Time spent on that website: ", totalTime[domain]);
     delete tabDomains[tabId]; // Clean up the stored info
     delete tabStartTimes[tabId];
+    saveTimeData();
   }
 });
+
+//If a message is received, this function runs
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'getTotalTime') {
+    sendResponse(totalTime); // Send the totalTime object as the response
+  }
+});
+
+function saveTimeData() {
+  chrome.storage.local.set({ totalTime: totalTime }, function() {
+      console.log('Time spent data saved');
+  });
+}
+
+function loadTimeData() {
+  chrome.storage.local.get('totalTime', function(result) {
+      if (result.totalTime) {
+        totalTime = result.totalTime;
+      }
+  });
+}
+
+// Load data on extension start
+loadTimeData();

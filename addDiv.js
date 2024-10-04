@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           // Image and click event set-up:
           const img = document.getElementById('catImage'); //getting and setting image of the cat
           img.src = chrome.runtime.getURL('images/catsitting.png');
-          img.addEventListener('click', toggleMenu);
+          img.addEventListener('click', toggleMenu); //mouseover and mouseout are also events
 
           const settingButton = document.getElementById('settingsButton');
           settingButton.src = chrome.runtime.getURL('images/settingButton1.png');
@@ -31,6 +31,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
           const settingsMenuDiv = document.getElementById('settingsMenu');
           settingsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
+
+          // Time stats
+          const listElement = document.getElementById('time-list'); // The list in overlay.html
+          
+          chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
+            console.log("Received response:", response); // Log the response
+            if (response) {
+              listElement.innerHTML = ''; // Clear the list
+              for (const [domain, time] of Object.entries(response)) {
+                console.log("1");
+                let listItem = document.createElement('li');
+                listItem.textContent = `${domain}: ${time.toFixed(2)} seconds`;
+                listElement.appendChild(listItem);
+              }
+            }
+          });
         })
         .catch(err => console.error('Error loading overlay:', err));
       }
@@ -79,10 +95,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           positionY -= delta;
           delta /= rateOfDecay;
           
-          // Apply the updated background position
+          //apply the updated background position
           menu.style.backgroundPosition = `center ${positionY}px`;
           
-          // Stop the animation once the background reaches the center (0px)
+          // stop the animation once the background reaches the center (0px)
           if (positionY <= 2) {
             menu.style.backgroundPosition = `center 0px`;
             settingInterior.style.display = 'block';
@@ -90,12 +106,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               clearInterval(animationInterval);
             }
           }
-        }, 3);  // Interval speed in ms
+        }, 3);  // interval speed in ms
       }
       else { 
         if (animationInterval) {
           clearInterval(animationInterval);
-          animationInterval = null;  // Reset interval ID
+          animationInterval = null;  // reset interval ID
         }
         menu.style.display = 'none';
       }
