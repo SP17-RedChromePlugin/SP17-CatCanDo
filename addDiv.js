@@ -17,9 +17,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           document.body.appendChild(div.firstElementChild); // Append the actual div element
 
           // Image and click event set-up:
-          const img = document.getElementById('catImage'); //getting and setting image of the cat
-          img.src = chrome.runtime.getURL('images/catsitting.png');
-          img.addEventListener('click', toggleMenu); //mouseover and mouseout are also events
+          const catPet = document.getElementById('catImage'); //getting and setting image of the cat
+          catPet.src = chrome.runtime.getURL('images/catsitting.png');
+
+          const menuOpener = document.getElementById('catMenuOpener'); //getting and setting image of the cat
+          menuOpener.src = chrome.runtime.getURL('images/upButton.png');
+          menuOpener.addEventListener('click', toggleMenu); //mouseover and mouseout are also events
 
           const settingButton = document.getElementById('settingsButton');
           settingButton.src = chrome.runtime.getURL('images/settingButton1.png');
@@ -42,7 +45,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               for (const [domain, time] of Object.entries(response)) {
                 console.log("1");
                 let listItem = document.createElement('li');
-                listItem.textContent = `${domain}: ${time.toFixed(2)} seconds`;
+                if (time < 60) {
+                  listItem.textContent = `${domain}: ${Math.ceil(time)} seconds`;
+                } else if (time < 3600) {
+                  listItem.textContent = `${domain}: ${Math.round(time/60)} minutes`;
+                }
                 listElement.appendChild(listItem);
               }
             }

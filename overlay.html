@@ -1,17 +1,18 @@
 <div id="overlayDiv" style="position: fixed; top:0; left:0; width:100%; height: 100%; z-index:9999; pointer-events: none;">
     <div id="catContainer" style="position:fixed; bottom:0; width:200px; height:200px;">
         <img id="catImage" src="" style="width:100%; height:100%; pointer-events:auto;">
-
+        <img id="catMenuOpener" src="" style="width:64px; height:64px; position:absolute; left:180px; bottom:150px; pointer-events:auto;">
+        
         <div id="catMenu" style="display: none; position:absolute; left:50px; bottom:230px; width:300px; height:50px; pointer-events:none;">
-            <img id="settingsButton" src="" style="width:64px; height:64px; position:absolute;left:80px; pointer-events:auto;">
-            <img id="calendarButton" src="" style="width:64px; height:64px; position:absolute;left:140px; top:30px; pointer-events:auto;">
+            <img id="settingsButton" src="" style="width:64px; height:64px; position:absolute; left:10px; top: 20px; pointer-events:auto;">
+            <img id="calendarButton" src="" style="width:64px; height:64px; position:absolute; left:80px; top:10px; pointer-events:auto;">
         </div>
 
         <div id="settingsMenu" style="display:none; position:absolute; bottom:300px; width:400px; height:400px; background-size:cover; background-repeat:no-repeat; background-position:center;">
             <div id="settingsInterior" style="display:none; padding:60px; padding-top:80px; pointer-events:auto;">
                 <p style="text-align:center; font-size:30px;">Settings</p>
                 <ul id="time-list">
-                    <!-- This will be dynamically filled with time spent on websites -->
+                    <!-- This will be filled with time spent on websites -->
                 </ul>
             </div>
         </div>
