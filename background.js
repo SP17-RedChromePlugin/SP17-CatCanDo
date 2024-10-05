@@ -38,6 +38,22 @@ let tabDomains = {}; // Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
 let totalTime = {}; //Stores total time spent on a website
 
+//Postprocess domain names
+function processDomain(input) {
+  if (input) {
+    console.log(input);
+    var parseInput = input.split('.');
+    if (parseInput.length > 2) {
+      return parseInput[1];
+    } else if (parseInput.length == 1 || parseInput.length == 2) {
+      return parseInput[0];
+    } else {
+      return input;
+    }
+  }
+  return 'null';
+}
+
 //listen for window focus change
 chrome.windows.onFocusChanged.addListener(windowId => {
   if (windowId === chrome.windows.WINDOW_ID_NONE) {
@@ -53,7 +69,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     chrome.tabs.get(details.tabId, function(tab) {
         // Extract the hostname from the URL
         let url = new URL(tab.url);
-        let domain = url.hostname;
+        let domain = processDomain(url.hostname);
 
         // Log the website domain
         tabDomains[details.tabId] = domain;
@@ -69,7 +85,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
   if (details.frameId === 0) {
     let currentDomain = tabDomains[details.tabId]; // Get the current domain for this tab
     let newUrl = new URL(details.url);
-    let newDomain = newUrl.hostname;
+    let newDomain = processDomain(newUrl.hostname);
 
     if (currentDomain !== newDomain && currentDomain) {
       console.log("Domain changed from:", currentDomain, "to:", newDomain);
@@ -111,6 +127,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function saveTimeData() {
+  //totalTime = {}; //to clear data
   chrome.storage.local.set({ totalTime: totalTime }, function() {
       console.log('Time spent data saved');
   });

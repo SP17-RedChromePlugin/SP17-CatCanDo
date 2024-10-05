@@ -1,5 +1,6 @@
 // Listen for messages from the background script
 let stateChangeTimeout = null;
+let shadowRoot = null;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'addDiv') {
 
@@ -13,30 +14,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .then(response => response.text())
         .then(html => {
           const div = document.createElement('div');
-          div.innerHTML = html;
-          document.body.appendChild(div.firstElementChild); // Append the actual div element
+          shadowRoot = div.attachShadow({ mode: 'open' });
+          shadowRoot.innerHTML = `
+                <style>
+                    #overlayDiv {
+                        all: initial; /* Reset all inherited styles */
+                        font-size: 15px;
+                        font-family: Arial, sans-serif; /* Ensure font-family is defined */
+                        font-weight: normal;
+                        font-style: normal;
+                        line-height: 1; /* Explicitly set line height */
+                        margin: 0;
+                        padding: 0;
+                        border: 0;
+                        vertical-align: baseline;
+                    }
+                </style>
+                ${html}`;
+          document.body.appendChild(div); // Append the actual div element
 
           // Image and click event set-up:
-          const catPet = document.getElementById('catImage'); //getting and setting image of the cat
+          const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
           catPet.src = chrome.runtime.getURL('images/catsitting.png');
 
-          const menuOpener = document.getElementById('catMenuOpener'); //getting and setting image of the cat
+          const menuOpener = shadowRoot.getElementById('catMenuOpener'); //getting and setting image of the cat
           menuOpener.src = chrome.runtime.getURL('images/upButton.png');
           menuOpener.addEventListener('click', toggleMenu); //mouseover and mouseout are also events
 
-          const settingButton = document.getElementById('settingsButton');
+          const settingButton = shadowRoot.getElementById('settingsButton');
           settingButton.src = chrome.runtime.getURL('images/settingButton1.png');
           settingButton.addEventListener('click', settingsMenu);
 
-          const calendarButton = document.getElementById('calendarButton');
+          const calendarButton = shadowRoot.getElementById('calendarButton');
           calendarButton.src = chrome.runtime.getURL('images/calenderButton1.png');
           calendarButton.addEventListener('click', calendarMenu);
 
-          const settingsMenuDiv = document.getElementById('settingsMenu');
+          const settingsMenuDiv = shadowRoot.getElementById('settingsMenu');
           settingsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
 
           // Time stats
-          const listElement = document.getElementById('time-list'); // The list in overlay.html
+          const listElement = shadowRoot.getElementById('time-list'); // The list in overlay.html
           
           chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
             console.log("Received response:", response); // Log the response
@@ -58,7 +75,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .catch(err => console.error('Error loading overlay:', err));
       }
     } else if (message.action === 'removeDiv') {
-      const div = document.getElementById('overlayDiv');
+      const div = shadowRoot.getElementById('overlayDiv');
       clearTimeout(stateChangeTimeout);
       if (div) {
         div.remove();
@@ -67,8 +84,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   });
 
   function toggleMenu() {
-    const menu = document.getElementById('catMenu');
-    const settingsMenu = document.getElementById('settingsMenu');
+    const menu = shadowRoot.getElementById('catMenu');
+    const settingsMenu = shadowRoot.getElementById('settingsMenu');
     if (menu) {
       if (menu.style.display === 'none') { menu.style.display = 'block';} //toggles visibility based on current visibility
       else { menu.style.display = 'none'}
@@ -80,8 +97,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   let animationInterval = null;
   function settingsMenu() {
-    const menu = document.getElementById('settingsMenu');
-    const settingInterior = document.getElementById('settingsInterior');
+    const menu = shadowRoot.getElementById('settingsMenu');
+    const settingInterior = shadowRoot.getElementById('settingsInterior');
     if (menu) {
       if (menu.style.display === 'none') { 
 
