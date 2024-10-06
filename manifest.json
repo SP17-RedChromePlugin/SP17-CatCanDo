@@ -20,7 +20,7 @@
     "web_accessible_resources": [
       {
         "resources": ["overlay.html", 
-        "settings.html",
+        "stats.html",
         "images/catsitting.png", 
         "images/calenderButton1.png",
         "images/calenderButton2.png",

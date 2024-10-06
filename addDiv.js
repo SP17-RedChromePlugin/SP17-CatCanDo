@@ -47,9 +47,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
           const calendarButton = shadowRoot.getElementById('calendarButton');
           calendarButton.src = chrome.runtime.getURL('images/calenderButton1.png');
-          calendarButton.addEventListener('click', calendarMenu);
+          calendarButton.addEventListener('click', statsMenu);
 
-          const settingsMenuDiv = shadowRoot.getElementById('settingsMenu');
+          const settingsMenuDiv = shadowRoot.getElementById('statsMenu');
           settingsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
 
           // Time stats
@@ -58,14 +58,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
             console.log("Received response:", response); // Log the response
             if (response) {
+              let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
               listElement.innerHTML = ''; // Clear the list
-              for (const [domain, time] of Object.entries(response)) {
+              for (const [domain, time] of sortedResponse) {
                 console.log("1");
                 let listItem = document.createElement('li');
                 if (time < 60) {
                   listItem.textContent = `${domain}: ${Math.ceil(time)} seconds`;
                 } else if (time < 3600) {
                   listItem.textContent = `${domain}: ${Math.round(time/60)} minutes`;
+                } else {
+                  listItem.textContent = `${domain}: ${(time/3600).toFixed(1)} hours`; 
                 }
                 listElement.appendChild(listItem);
               }
@@ -96,9 +99,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   let animationInterval = null;
-  function settingsMenu() {
-    const menu = shadowRoot.getElementById('settingsMenu');
-    const settingInterior = shadowRoot.getElementById('settingsInterior');
+  function statsMenu() {
+    const menu = shadowRoot.getElementById('statsMenu');
+    const settingInterior = shadowRoot.getElementById('statsInterior');
     if (menu) {
       if (menu.style.display === 'none') { 
 
@@ -142,8 +145,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 
-  function calendarMenu() {
-    console.log("Calendar clicked!!!!");
+  function settingsMenu() {
+    console.log("Settings clicked!!!!");
   }
 
   function executeStateChange() {
