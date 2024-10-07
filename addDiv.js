@@ -36,6 +36,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           // Image and click event set-up:
           const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
           catPet.src = chrome.runtime.getURL('images/catsitting.png');
+          catPet.addEventListener('click', catClicked);
+          catPet.addEventListener('mouseover', () => catHovered(true));
+          catPet.addEventListener('mouseout', () => catHovered(false));
 
           const menuOpener = shadowRoot.getElementById('catMenuOpener'); //getting and setting image of the cat
           menuOpener.src = chrome.runtime.getURL('images/upButton.png');
@@ -61,7 +64,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
               listElement.innerHTML = ''; // Clear the list
               for (const [domain, time] of sortedResponse) {
-                console.log("1");
                 let listItem = document.createElement('li');
                 if (time < 60) {
                   listItem.textContent = `${domain}: ${Math.ceil(time)} seconds`;
@@ -88,7 +90,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   function toggleMenu() {
     const menu = shadowRoot.getElementById('catMenu');
-    const settingsMenu = shadowRoot.getElementById('settingsMenu');
+    const settingsMenu = shadowRoot.getElementById('statsMenu');
     if (menu) {
       if (menu.style.display === 'none') { menu.style.display = 'block';} //toggles visibility based on current visibility
       else { menu.style.display = 'none'}
@@ -185,4 +187,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   function sitState() {
     console.log("Cat is sitting.");
+  }
+
+  // Cat interaction
+  function catClicked() {
+    const menu = shadowRoot.getElementById('catMenu');
+    const settingsMenu = shadowRoot.getElementById('statsMenu');
+    menu.style.display = 'none';
+    settingsMenu.style.display = 'none';
+
+    const speechBubble = shadowRoot.getElementById('speechBubble');
+
+    chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
+      //console.log("Received response:", response); // Log the response
+      if (response) {
+        let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
+        let speechChoice = 0;//Math.floor(Math.random() * 3);
+        switch (speechChoice) {
+          case 0: //Say what the website with the most time is
+            break;
+          case 1: //Say your total time
+            break;
+          case 2: //Say favorite websites
+            break;
+        }
+      }
+    });
+
+    speechBubble.style.display = 'block';
+    setTimeout(() => {
+      speechBubble.style.display = 'none';
+    }, 8000);
+  }
+
+  function catHovered(isHovering) {
+    console.log("hover: ", isHovering)
   }
