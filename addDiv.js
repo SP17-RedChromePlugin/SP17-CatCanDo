@@ -190,7 +190,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   // Cat interaction
+  let speechBubbleTimeoutId = null;
   function catClicked() {
+    if (speechBubbleTimeoutId) {
+      clearTimeout(speechBubbleTimeoutId);
+    }
     const menu = shadowRoot.getElementById('catMenu');
     const settingsMenu = shadowRoot.getElementById('statsMenu');
     menu.style.display = 'none';
@@ -202,20 +206,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       //console.log("Received response:", response); // Log the response
       if (response) {
         let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
-        let speechChoice = 0;//Math.floor(Math.random() * 3);
+        let speechChoice = Math.floor(Math.random() * 3);
         switch (speechChoice) {
           case 0: //Say what the website with the most time is
+            let mostTime = sortedResponse[0];
+            let mostTimeHours = Math.floor(mostTime[1] / 60);
+            speechBubble.innerHTML = `You've spent the most time on ${mostTime[0]}! That's ${mostTimeHours} minutes!`;
             break;
           case 1: //Say your total time
+            let totalTime = 0;
+            for (const [domain, time] of sortedResponse) {
+              totalTime += time;
+            }
+            let hours = Math.floor(totalTime / 3600);
+            let minutes = Math.floor((totalTime % 3600) / 60);
+            speechBubble.innerHTML = `You've spent ${hours} hours and ${minutes} minutes exploring the web!`;
             break;
           case 2: //Say favorite websites
+            let favWebsites = sortedResponse.slice(0, 3);
+            speechBubble.innerHTML = `Your favorite websites look to be ${favWebsites[0][0]}, ${favWebsites[1][0]}, and ${favWebsites[2][0]}!`;
             break;
         }
       }
     });
 
     speechBubble.style.display = 'block';
-    setTimeout(() => {
+    speechBubbleTimeoutId = setTimeout(() => {
       speechBubble.style.display = 'none';
     }, 8000);
   }
