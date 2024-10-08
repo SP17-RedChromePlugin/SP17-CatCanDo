@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
         .then(response => response.text())
         .then(html => {
           const div = document.createElement('div');
-          shadowRoot = div.attachShadow({ mode: 'open' });
+          shadowRoot = div.attachShadow({ mode: 'open' }); //Creating a shadow root so that external css does not affect inserted html
           shadowRoot.innerHTML = `
                 <style>
                     #overlayDiv {
@@ -40,6 +40,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           catPet.addEventListener('click', catClicked);
           catPet.addEventListener('mouseover', () => catHovered(true));
           catPet.addEventListener('mouseout', () => catHovered(false));
+
+          const mainDiv = shadowRoot.getElementById('catContainer');
+          mainDiv.addEventListener('mouseover', () => showMenu(true));
+          mainDiv.addEventListener('mouseout', () => showMenu(false));
 
           const menuOpener = shadowRoot.getElementById('catMenuOpener'); //getting and setting image of the cat
           menuOpener.src = chrome.runtime.getURL('images/upButton.png');
@@ -89,12 +93,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     }
   });
 
+  let menuOpen = false;
   function toggleMenu() {
     const menu = shadowRoot.getElementById('catMenu');
     const settingsMenu = shadowRoot.getElementById('statsMenu');
     if (menu) {
-      if (menu.style.display === 'none') { menu.style.display = 'block';} //toggles visibility based on current visibility
-      else { menu.style.display = 'none'}
+      if (menu.style.display === 'none') { 
+        menu.style.display = 'block';
+        menuOpen = true;
+      } //toggles visibility based on current visibility
+      else { 
+        menu.style.display = 'none'
+        menuOpen = false;
+      }
       if (settingsMenu) {
         settingsMenu.style.display = 'none';
       }
@@ -193,50 +204,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   // Cat interaction
   let speechBubbleTimeoutId = null;
   function catClicked() {
-    if (speechBubbleTimeoutId) {
-      clearTimeout(speechBubbleTimeoutId);
-    }
-    const menu = shadowRoot.getElementById('catMenu');
-    const settingsMenu = shadowRoot.getElementById('statsMenu');
-    menu.style.display = 'none';
-    settingsMenu.style.display = 'none';
-
     const speechBubble = shadowRoot.getElementById('speechBubble');
-
-    chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
-      //console.log("Received response:", response); // Log the response
-      if (response) {
-        let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
-        let speechChoice = Math.floor(Math.random() * 3);
-        switch (speechChoice) {
-          case 0: //Say what the website with the most time is
-            let mostTime = sortedResponse[0];
-            let mostTimeHours = Math.floor(mostTime[1] / 60);
-            speechBubble.innerHTML = `You've spent the most time on ${mostTime[0]}! That's ${mostTimeHours} minutes!`;
-            break;
-          case 1: //Say your total time
-            let totalTime = 0;
-            for (const [domain, time] of sortedResponse) {
-              totalTime += time;
-            }
-            let hours = Math.floor(totalTime / 3600);
-            let minutes = Math.floor((totalTime % 3600) / 60);
-            speechBubble.innerHTML = `You've spent ${hours} hours and ${minutes} minutes exploring the web!`;
-            break;
-          case 2: //Say favorite websites
-            let favWebsites = sortedResponse.slice(0, 3);
-            speechBubble.innerHTML = `Your favorite websites look to be ${favWebsites[0][0]}, ${favWebsites[1][0]}, and ${favWebsites[2][0]}!`;
-            break;
-        }
-      }
-    });
-
-    speechBubble.style.display = 'block';
-    speechBubbleTimeoutId = setTimeout(() => {
+    if (speechBubbleTimeoutId) { //Clear timeout and hide speech bubble
+      clearTimeout(speechBubbleTimeoutId);
+      speechBubbleTimeoutId = null;
       speechBubble.style.display = 'none';
-    }, 8000);
+    } else {
+      const menu = shadowRoot.getElementById('catMenu');
+      const settingsMenu = shadowRoot.getElementById('statsMenu');
+      menu.style.display = 'none';
+      settingsMenu.style.display = 'none';
+
+      chrome.runtime.sendMessage({ action: 'getTotalTime' }, function(response) {
+        //console.log("Received response:", response); // Log the response
+        if (response) {
+          let sortedResponse = Object.entries(response).sort((a, b) => b[1] - a[1]).slice(0,10);
+          let speechChoice = Math.floor(Math.random() * 3);
+          switch (speechChoice) {
+            case 0: //Say what the website with the most time is
+              let mostTime = sortedResponse[0];
+              let mostTimeHours = Math.floor(mostTime[1] / 60);
+              speechBubble.innerHTML = `You've spent the most time on ${mostTime[0]}! That's ${mostTimeHours} minutes!`;
+              break;
+            case 1: //Say your total time
+              let totalTime = 0;
+              for (const [domain, time] of sortedResponse) {
+                totalTime += time;
+              }
+              let hours = Math.floor(totalTime / 3600);
+              let minutes = Math.floor((totalTime % 3600) / 60);
+              speechBubble.innerHTML = `You've spent ${hours} hours and ${minutes} minutes exploring the web!`;
+              break;
+            case 2: //Say favorite websites
+              let favWebsites = sortedResponse.slice(0, 3);
+              speechBubble.innerHTML = `Your favorite websites look to be ${favWebsites[0][0]}, ${favWebsites[1][0]}, and ${favWebsites[2][0]}!`;
+              break;
+          }
+        }
+      });
+
+      speechBubble.style.display = 'block';
+      speechBubbleTimeoutId = setTimeout(() => {
+        speechBubble.style.display = 'none';
+      }, 8000);
+    }
   }
 
   function catHovered(isHovering) {
     console.log("hover: ", isHovering)
+  }
+
+  function showMenu(isOpen) {
+    const menuOpener = shadowRoot.getElementById('catMenuOpener');
+    if (menuOpener) {
+      if (isOpen) {
+        menuOpener.style.display = 'block';
+      } else if (menuOpen === false) {
+        menuOpener.style.display = 'none';
+      }
+    }
   }
