@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["addDiv.js", "graphs.js"]
+      "js": ["addDiv.js"]
     }
   ],
   "web_accessible_resources": [

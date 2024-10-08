@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
                 </style>
                 ${html}`;
           document.body.appendChild(div); // Append the actual div element
-
+          
           // Image and click event set-up:
           const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
           catPet.src = chrome.runtime.getURL('images/catsitting.png');
