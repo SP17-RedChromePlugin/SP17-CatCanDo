@@ -71,11 +71,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
               for (const [domain, time] of sortedResponse) {
                 let listItem = document.createElement('li');
                 if (time < 60) {
-                  listItem.textContent = `${domain}: ${Math.ceil(time)} seconds`;
+                  listItem.innerHTML = `<b>${domain}</b>: ${Math.ceil(time)} seconds`;
                 } else if (time < 3600) {
-                  listItem.textContent = `${domain}: ${Math.round(time/60)} minutes`;
+                  listItem.innerHTML = `<b>${domain}</b>: ${Math.round(time/60)} minutes`;
                 } else {
-                  listItem.textContent = `${domain}: ${(time/3600).toFixed(1)} hours`; 
+                  listItem.innerHTML = `<b>${domain}</b>: ${(time/3600).toFixed(1)} hours`; 
                 }
                 listElement.appendChild(listItem);
               }
@@ -99,7 +99,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     const settingsMenu = shadowRoot.getElementById('statsMenu');
     if (menu) {
       if (menu.style.display === 'none') { 
-        menu.style.display = 'block';
+        menu.style.display = 'flex';
         menuOpen = true;
       } //toggles visibility based on current visibility
       else { 
@@ -129,7 +129,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
         const initialDelta = delta;
         const rateOfDecay = 1 / (1 - (initialDelta/initialPos));
         menu.style.backgroundPosition = `center ${positionY}px`;
-        menu.style.display = 'block';
+        menu.style.display = 'flex';
         settingInterior.style.display = 'none';
 
         animationInterval = setInterval(() => {
@@ -142,7 +142,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           // stop the animation once the background reaches the center (0px)
           if (positionY <= 2) {
             menu.style.backgroundPosition = `center 0px`;
-            settingInterior.style.display = 'block';
+            settingInterior.style.display = 'flex';
             if (animationInterval) {
               clearInterval(animationInterval);
             }
@@ -224,7 +224,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
             case 0: //Say what the website with the most time is
               let mostTime = sortedResponse[0];
               let mostTimeHours = Math.floor(mostTime[1] / 60);
-              speechBubble.innerHTML = `You've spent the most time on ${mostTime[0]}! That's ${mostTimeHours} minutes!`;
+              speechBubble.innerHTML = `You've spent the most time on <b>${mostTime[0]}</b>! That's <b>${mostTimeHours}</b> minutes!`;
               break;
             case 1: //Say your total time
               let totalTime = 0;
@@ -233,11 +233,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
               }
               let hours = Math.floor(totalTime / 3600);
               let minutes = Math.floor((totalTime % 3600) / 60);
-              speechBubble.innerHTML = `You've spent ${hours} hours and ${minutes} minutes exploring the web!`;
+              speechBubble.innerHTML = `You've spent <b>${hours}</b> hours and <b>${minutes}</b> minutes exploring the web!`;
               break;
             case 2: //Say favorite websites
               let favWebsites = sortedResponse.slice(0, 3);
-              speechBubble.innerHTML = `Your favorite websites look to be ${favWebsites[0][0]}, ${favWebsites[1][0]}, and ${favWebsites[2][0]}!`;
+              speechBubble.innerHTML = `Your favorite websites look to be <b>${favWebsites[0][0]}</b>, <b>${favWebsites[1][0]}</b>, and <b>${favWebsites[2][0]}</b>!`;
               break;
           }
         }

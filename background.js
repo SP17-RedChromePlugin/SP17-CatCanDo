@@ -87,7 +87,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
     let newUrl = new URL(details.url);
     let newDomain = processDomain(newUrl.hostname);
 
-    if (currentDomain !== newDomain && currentDomain) {
+    if (currentDomain) {
       console.log("Domain changed from:", currentDomain, "to:", newDomain);
       let currentDate = new Date();
       let dateDifference = currentDate - tabStartTimes[details.tabId];

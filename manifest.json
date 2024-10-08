@@ -1,25 +1,25 @@
 {
-    "manifest_version": 3,
-    "name": "CatCanDo",
-    "description": "Browser pet that helps manages your time on the web!",
-    "version": "1.0",
-    "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
-    "action": {
-      "default_icon": "images/logo.png"
-    },
-
-    "background": {
+  "manifest_version": 3,
+  "name": "CatCanDo",
+  "description": "Browser pet that helps manages your time on the web!",
+  "version": "1.0",
+  "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
+  "action": {
+    "default_icon": "images/logo.png"
+  },
+  "background": {
     "service_worker": "background.js"
-    },
-    "content_scripts": [
+  },
+  "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["addDiv.js"]
+      "js": ["addDiv.js", "graphs.js"]
     }
-    ],
-    "web_accessible_resources": [
-      {
-        "resources": ["overlay.html", 
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "overlay.html", 
         "stats.html",
         "images/catsitting.png", 
         "images/calenderButton1.png",
@@ -27,8 +27,9 @@
         "images/settingButton1.png",
         "images/settingButton2.png",
         "images/catmenu.png",
-        "images/upButton.png"],
-        "matches": ["<all_urls>"]
-      }
-    ]
+        "images/upButton.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
