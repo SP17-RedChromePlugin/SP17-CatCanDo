@@ -1,7 +1,7 @@
 // Listen for messages from the background script
 let stateChangeTimeout = null;
 let shadowRoot = null;
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fires when a chrome message is sent
     if (message.action === 'addDiv') {
 
       //Cat state deciding loop
@@ -23,6 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                         font-family: Arial, sans-serif; /* Ensure font-family is defined */
                         font-weight: normal;
                         font-style: normal;
+                        color: black;
                         line-height: 1; /* Explicitly set line height */
                         margin: 0;
                         padding: 0;
