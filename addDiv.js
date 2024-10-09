@@ -268,7 +268,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   }
 
   function addGraphs() {
-    console.log("graph loading");
+    let weekChartDate = [];
+    chrome.runtime.sendMessage({ action: 'getTotalTimeEachDay' }, function(response) {
+      if (response) {
+        //Get total cumulative time for each dictionary in the response 0-7
+        for (let i = 0; i < 7; i++) {
+          let totalTime = 0;
+          for (domain in response[i]) {
+            totalTime += response[i][domain];
+          }
+          weekChartDate.push(totalTime/3600);
+          console.log("Total time for day", i, "is", totalTime);
+        }
+      }
+    });
+
     const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
     const weekChart = new Chart(ctx, {
         type: 'bar', // or 'line', 'pie', etc.
@@ -276,7 +290,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
             labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             datasets: [{
                 label: 'Hours Spent Online',
-                data: [2, 3, 4, 5, 6, 7, 8], // Replace with your actual data
+                data: weekChartDate, // Replace with your actual data
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1

@@ -38,6 +38,7 @@ let tabDomains = {}; // Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
 let totalTime = {}; //Stores total time spent on a website
 let totalTimeEachDay = {}; //Stores the totalTime object for each day, for a week. Will have seven objects, one for each day of the week
+let currentDay = null; //Stores the current date
 
 //Postprocess domain names
 function processDomain(input) {
@@ -113,6 +114,7 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
       totalTime[domain] = 0;
     }
     totalTime[domain] += dateDifference / (1000); //converting milliseconds to seconds
+    totalTimeEachDay[currentDay.getDay()] = totalTime;
     console.log("Time spent on that website: ", totalTime[domain]);
     delete tabDomains[tabId]; // Clean up the stored info
     delete tabStartTimes[tabId];
@@ -125,20 +127,56 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getTotalTime') {
     sendResponse(totalTime); // Send the totalTime object as the response
   }
+  if (message.action === 'getTotalTimeEachDay') {
+    sendResponse(totalTimeEachDay); // Send the totalTimeEachDay object as the response
+  }
 });
 
 function saveTimeData() {
   //totalTime = {}; //to clear data
   chrome.storage.local.set({ totalTime: totalTime }, function() {
-      console.log('Time spent data saved');
+      console.log('Time spent data saved', totalTime);
+  });
+  chrome.storage.local.set({ currentDay: currentDay.toISOString() }, function() {
+    console.log('Current day saved', currentDay);
+  });
+  chrome.storage.local.set({ totalTimeEachDay: totalTimeEachDay }, function() {
+    console.log('Time spent each day for past week saved', totalTimeEachDay);
   });
 }
 
 function loadTimeData() {
+  currentDay = new Date();
   chrome.storage.local.get('totalTime', function(result) {
       if (result.totalTime) {
         totalTime = result.totalTime;
+        console.log("TotalTime, ", totalTime);
       }
+  });
+  chrome.storage.local.get('totalTimeEachDay', function(result) {
+    if (result.totalTimeEachDay) {
+      totalTimeEachDay = result.totalTimeEachDay;
+      console.log("TotalTimeEachDay, ", totalTimeEachDay);
+    }
+  });
+  chrome.storage.local.get('currentDay', function(result) {
+    if (result.currentDay) {
+      result.currentDay = new Date(result.currentDay);
+    }
+    if (result.currentDay instanceof Date && !isNaN(result.currentDay)) {
+      console.log("Previous day, ", result.currentDay);
+      console.log("Current day, ", currentDay);
+      currentDay = result.currentDay;
+    }
+    if (result.currentDay instanceof Date && result.currentDay != currentDay) {
+      //If there are multiple days in between result.currentDay and currentDay, set the totalTimeEachDay object to null
+      for (let day = result.currentDay.getDay() + 1; day < currentDay.getDay(); day++) {
+        console.log("User was not logged in on day ", day);
+        totalTimeEachDay[day] = {};
+      }
+      totalTimeEachDay[result.currentDay.getDay()] = totalTime;
+      totalTime = {};
+    }
   });
 }
 
