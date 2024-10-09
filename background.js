@@ -37,6 +37,7 @@ let timeSpent = {};
 let tabDomains = {}; // Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
 let totalTime = {}; //Stores total time spent on a website
+let totalTimeEachDay = {}; //Stores the totalTime object for each day, for a week. Will have seven objects, one for each day of the week
 
 //Postprocess domain names
 function processDomain(input) {

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "CatCanDo",
+  "name": "CatTracker",
   "description": "Browser pet that helps manages your time on the web!",
   "version": "1.0",
   "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["addDiv.js"]
+      "js": ["lib/Chart.min.js","addDiv.js"]
     }
   ],
   "web_accessible_resources": [

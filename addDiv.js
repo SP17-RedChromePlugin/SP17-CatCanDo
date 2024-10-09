@@ -33,6 +33,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
                 </style>
                 ${html}`;
           document.body.appendChild(div); // Append the actual div element
+
+          addGraphs(); // Add the graphs to the overlay
           
           // Image and click event set-up:
           const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
@@ -264,3 +266,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       }
     }
   }
+
+  function addGraphs() {
+    console.log("graph loading");
+    const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
+    const weekChart = new Chart(ctx, {
+        type: 'bar', // or 'line', 'pie', etc.
+        data: {
+            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            datasets: [{
+                label: 'Hours Spent Online',
+                data: [2, 3, 4, 5, 6, 7, 8], // Replace with your actual data
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
