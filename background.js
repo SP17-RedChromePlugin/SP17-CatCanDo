@@ -89,7 +89,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
     let newUrl = new URL(details.url);
     let newDomain = processDomain(newUrl.hostname);
 
-    if (currentDomain) {
+    if (currentDomain && currentDomain != 'newtab') {
       console.log("Domain changed from:", currentDomain, "to:", newDomain);
       let currentDate = new Date();
       let dateDifference = currentDate - tabStartTimes[details.tabId];
@@ -107,7 +107,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
   let domain = tabDomains[tabId]; // Get the stored domain for the closed tab
-  if (domain) {
+  if (domain && domain != 'newtab') {
     console.log("Tab closed:", domain);
     let currentDate = new Date();
     let dateDifference = currentDate - tabStartTimes[tabId];
@@ -135,6 +135,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 function saveTimeData() {
   //totalTime = {}; //to clear data
+  if (totalTime['newtab']) {
+    delete totalTime['newtab'];
+  }
   chrome.storage.local.set({ totalTime: totalTime }, function() {
       console.log('Time spent data saved', totalTime);
   });
