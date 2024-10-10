@@ -269,39 +269,88 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
 
   function addGraphs() {
     let weekChartDate = [];
+    let weekDomainTime = {};
+
     chrome.runtime.sendMessage({ action: 'getTotalTimeEachDay' }, function(response) {
       if (response) {
-        //Get total cumulative time for each dictionary in the response 0-7
+        // Get total cumulative time for each day (0-7)
         for (let i = 0; i < 7; i++) {
           let totalTime = 0;
-          for (domain in response[i]) {
+          for (let domain in response[i]) {
             totalTime += response[i][domain];
           }
-          weekChartDate.push(totalTime/3600);
-          console.log("Total time for day", i, "is", totalTime);
+          weekChartDate.push(totalTime / 3600);
         }
-      }
-    });
 
-    const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
-    const weekChart = new Chart(ctx, {
-        type: 'bar', // or 'line', 'pie', etc.
-        data: {
-            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            datasets: [{
-                label: 'Hours Spent Online',
-                data: weekChartDate, // Replace with your actual data
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+        // Get cumulative time for each unique domain
+        for (let i = 0; i < 7; i++) {
+          for (let domain in response[i]) {
+            if (!weekDomainTime[domain]) {
+              weekDomainTime[domain] = 0;
+            }
+            weekDomainTime[domain] += response[i][domain];
+          }
+        }
+        //Converting to Minutes
+        for (let domain in weekDomainTime) {
+          weekDomainTime[domain] /= 60;
+        }
+
+        //Checking values for WeekDomainTime
+        //console.log("WeekDomainTime, ", weekDomainTime);
+        //console.log("week Domain Keys: ", Object.keys(weekDomainTime));
+        //console.log("week Domain Values: ", Object.values(weekDomainTime));
+
+        // Create the charts
+        const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
+        const weekChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                datasets: [{
+                    label: 'Hours',
+                    data: weekChartDate,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
+        });
+
+        let sortedWeekDomainTime = Object.entries(weekDomainTime).sort((a, b) => b[1] - a[1]).slice(0,5);
+        const ctx2 = shadowRoot.getElementById('websiteUsageCanvas').getContext('2d');
+        const websiteChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: sortedWeekDomainTime.map(([domain, time]) => domain),
+                datasets: [{
+                    label: 'Minutes',
+                    data: sortedWeekDomainTime.map(([domain, time]) => time),
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)', 
+                        'rgba(255, 99, 132, 0.2)', 
+                        'rgba(54, 162, 235, 0.2)', 
+                        'rgba(255, 206, 86, 0.2)', 
+                        'rgba(153, 102, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)', 
+                        'rgba(255, 99, 132, 1)', 
+                        'rgba(54, 162, 235, 1)', 
+                        'rgba(255, 206, 86, 1)', 
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+      }
     });
 }
