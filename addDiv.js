@@ -287,7 +287,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     const weekChart = new Chart(ctx, {
         type: 'bar', // or 'line', 'pie', etc.
         data: {
-            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             datasets: [{
                 label: 'Hours Spent Online',
                 data: weekChartDate, // Replace with your actual data

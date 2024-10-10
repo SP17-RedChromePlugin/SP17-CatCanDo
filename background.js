@@ -99,6 +99,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
       totalTime[currentDomain] += dateDifference / (1000); //converting milliseconds to seconds
       tabDomains[details.tabId] = newDomain;
       tabStartTimes[details.tabId] = currentDate;
+      totalTimeEachDay[currentDay.getDay()] = totalTime;
       console.log("Time spent on that website: ", totalTime[currentDomain]);
     }
   }
@@ -162,20 +163,21 @@ function loadTimeData() {
   chrome.storage.local.get('currentDay', function(result) {
     if (result.currentDay) {
       result.currentDay = new Date(result.currentDay);
-    }
-    if (result.currentDay instanceof Date && !isNaN(result.currentDay)) {
       console.log("Previous day, ", result.currentDay);
       console.log("Current day, ", currentDay);
-      currentDay = result.currentDay;
-    }
-    if (result.currentDay instanceof Date && result.currentDay != currentDay) {
-      //If there are multiple days in between result.currentDay and currentDay, set the totalTimeEachDay object to null
-      for (let day = result.currentDay.getDay() + 1; day < currentDay.getDay(); day++) {
-        console.log("User was not logged in on day ", day);
-        totalTimeEachDay[day] = {};
+
+      if (result.currentDay instanceof Date && !isNaN(result.currentDay) && result.currentDay.getDay() != currentDay.getDay()) {
+        console.log("New day, resetting time data");
+        //If there are multiple days in between result.currentDay and currentDay, set the totalTimeEachDay object to null
+        for (let day = result.currentDay.getDay() + 1; day < currentDay.getDay(); day++) {
+          console.log("User was not logged in on day ", day);
+          totalTimeEachDay[day] = {};
+        }
+        totalTimeEachDay[result.currentDay.getDay()] = totalTime;
+        totalTime = {};
+        console.log("New totalTimeEachDay, ", totalTimeEachDay);
+        console.log("New totalTime, ", totalTime);
       }
-      totalTimeEachDay[result.currentDay.getDay()] = totalTime;
-      totalTime = {};
     }
   });
 }
