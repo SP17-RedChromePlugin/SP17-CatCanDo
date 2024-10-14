@@ -27,7 +27,8 @@
         "images/settingButton1.png",
         "images/settingButton2.png",
         "images/catmenu.png",
-        "images/upButton.png"
+        "images/upButton.png",
+        "images/catwalkinggif.gif"
       ],
       "matches": ["<all_urls>"]
     }
