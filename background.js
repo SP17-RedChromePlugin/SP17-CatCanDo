@@ -45,7 +45,7 @@ function processDomain(input) {
   if (input) {
     console.log(input);
     var parseInput = input.split('.');
-    if (parseInput.length > 2) {
+    if (parseInput.length == 3) {
       return parseInput[1];
     } else if (parseInput.length == 1 || parseInput.length == 2) {
       return parseInput[0];
