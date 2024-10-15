@@ -225,8 +225,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           switch (speechChoice) {
             case 0: //Say what the website with the most time is
               let mostTime = sortedResponse[0];
-              let mostTimeHours = Math.floor(mostTime[1] / 60);
-              speechBubble.innerHTML = `You've spent the most time on <b>${mostTime[0]}</b>! That's <b>${mostTimeHours}</b> minutes!`;
+              let mostTimeMinutes = Math.floor(mostTime[1] / 60);
+              if (mostTime < 60) {
+                speechBubble.innerHTML = `You've spent the most time on <b>${mostTime[0]}</b> today! That's <b>${mostTime}</b> seconds!`;
+              } else {
+                speechBubble.innerHTML = `You've spent the most time on <b>${mostTime[0]}</b> today! That's <b>${mostTimeMinutes}</b> minutes!`;
+              }
               break;
             case 1: //Say your total time
               let totalTime = 0;
@@ -235,11 +239,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
               }
               let hours = Math.floor(totalTime / 3600);
               let minutes = Math.floor((totalTime % 3600) / 60);
-              speechBubble.innerHTML = `You've spent <b>${hours}</b> hours and <b>${minutes}</b> minutes exploring the web!`;
+              speechBubble.innerHTML = `You've spent <b>${hours}</b> hours and <b>${minutes}</b> minutes exploring the web today!`;
               break;
             case 2: //Say favorite websites
               let favWebsites = sortedResponse.slice(0, 3);
-              speechBubble.innerHTML = `Your favorite websites look to be <b>${favWebsites[0][0]}</b>, <b>${favWebsites[1][0]}</b>, and <b>${favWebsites[2][0]}</b>!`;
+              speechBubble.innerHTML = `You've spent the most time on <b>${favWebsites[0][0]}</b>, <b>${favWebsites[1][0]}</b>, and <b>${favWebsites[2][0]}</b> today!`;
               break;
           }
         }
