@@ -165,16 +165,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     console.log("Settings clicked!!!!");
   }
 
+  // ************************************************************************************************
+  // Cat States
+  // ************************************************************************************************
+
   function executeStateChange() {
-    let randomDelay = Math.floor(Math.random() * 20000) + 10000;
+    let randomDelay = Math.floor(Math.random() * 40000) + 10000;
   
     stateChangeTimeout = setTimeout(() => {
       // Generate a new state (0, 1, or 2)
       let newState = Math.floor(Math.random() * 3);
+
+      //end any previous animation
+      endAnimation();
       
       switch (newState) {
         case 0:
-          sleepState();
+          sleepState(randomDelay);
           break;
         case 1:
           walkState();
@@ -190,22 +197,121 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     }, randomDelay);
   }
 
-  // Cat States
-  function sleepState() {
+ let zInterval = null;
+ function sleepState(animationDuration) {
     console.log("Cat is sleeping... Zzz...");
+  
+    const catPetImage = shadowRoot.getElementById('catImage');
+    catPetImage.src = chrome.runtime.getURL('images/catsleepinggif.gif');
+  
+    const catContainer = shadowRoot.getElementById('catContainer');
+    let interval = 800;  // Time between Zs (in ms)
+  
+    // Function to create a single "Z" image with animation
+    function createZ() {
+      const sleepZ = document.createElement('img');
+      sleepZ.src = chrome.runtime.getURL('images/sleepingZ.png');
+      sleepZ.style.position = 'absolute';
+      sleepZ.style.width = '50px';
+      sleepZ.style.height = '50px';
+      sleepZ.style.top = `${catPetImage.offsetTop}px`; 
+      sleepZ.style.left = `${catPetImage.offsetLeft + Math.random() * 50}px`;  // Random horizontal offset
+      sleepZ.style.opacity = 1;
+      sleepZ.style.transition = 'all 3s ease-out';  // Longer animation
+  
+      // Append the Z image to the container
+      catContainer.appendChild(sleepZ);
+  
+      // Trigger the animation
+      setTimeout(() => {
+        sleepZ.style.top = `${catPetImage.offsetTop - 150 - Math.random() * 50}px`;  // Random upward movement
+        sleepZ.style.opacity = 0;  // Fade out
+      }, 10);
+  
+      // Remove the Z after animation ends
+      sleepZ.addEventListener('transitionend', () => {
+        sleepZ.remove();
+      });
+    }
+  
+    // Create multiple Zs over time
+    zInterval = setInterval(() => {
+      createZ();
+    }, interval);
+  
+    // Stop creating Zs after the animation duration
+    setTimeout(() => {
+      clearInterval(zInterval);
+      console.log("Sleeping animation ended.");
+    }, animationDuration);
   }
 
   function walkState() {
     console.log("Cat is walking!");
+    endAnimation();
+    const catPet = shadowRoot.getElementById('catContainer');
+    const catPetImage = shadowRoot.getElementById('catImage');
+
+    catPetImage.src = chrome.runtime.getURL('images/catwalkinggif.gif'); // Update to walking gif
+
+    let positionX = parseInt(catPet.style.transform.replace(/[^\d\-\.]/g, '')) || 0; // Retain previous position
+    const step = 5; // Pixels to move per step
+
+    // Randomly choose direction: 1 for right, -1 for left
+    const direction = Math.random() < 0.5 ? 1 : -1;
+
+    // Flip the cat based on direction using CSS scaleX
+    catPetImage.style.transform = `scaleX(${direction})`;
+
+    // Clear any previous animation intervals to avoid overlap
+    if (animationInterval) clearInterval(animationInterval);
+
+    // Create a new interval to animate the cat's movement
+    animationInterval = setInterval(() => {
+      positionX += step * direction; // Move the cat in the chosen direction
+
+      // Check if the cat moves off-screen and reverse its direction
+      if (positionX > window.innerWidth - catPet.offsetWidth || positionX < 0) {
+        console.log(`PositionX: ${positionX}, WindowWidth: ${window.innerWidth}, CatWidth: ${catPet.offsetWidth}`);
+        clearInterval(animationInterval); // Stop the animation
+        walkState(); // Restart with a new direction
+        return;
+      }
+
+        // Apply the new position
+        catPet.style.transform = `translateX(${positionX}px)`;
+    }, 100); // Adjust interval speed for smoother animation
   }
 
   function sitState() {
     console.log("Cat is sitting.");
   }
 
+  function endAnimation(){
+    //const catPet = shadowRoot.getElementById('catContainer');
+    const catPetImage = shadowRoot.getElementById('catImage');
+
+    if (animationInterval) {
+      clearInterval(animationInterval); // Stop the animation
+      animationInterval = null;
+    }
+    if (zInterval) {
+      clearInterval(zInterval);
+      zInterval = null;
+    }
+    catPetImage.src = chrome.runtime.getURL('images/catsitting.png');
+  }
+
+
+  // ************************************************************************************************
   // Cat interaction
+  // ************************************************************************************************
+
   let speechBubbleTimeoutId = null;
   function catClicked() {
+    //end any active animation
+    endAnimation();
+
     const speechBubble = shadowRoot.getElementById('speechBubble');
     if (speechBubbleTimeoutId) { //Clear timeout and hide speech bubble
       clearTimeout(speechBubbleTimeoutId);
@@ -243,7 +349,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
               break;
             case 2: //Say favorite websites
               let favWebsites = sortedResponse.slice(0, 3);
-              speechBubble.innerHTML = `You've spent the most time on <b>${favWebsites[0][0]}</b>, <b>${favWebsites[1][0]}</b>, and <b>${favWebsites[2][0]}</b> today!`;
+              if (favWebsites.length < 3) {
+                speechBubble.innerHTML = `You haven't visited a lot of websites today :3`;
+              } else {
+                speechBubble.innerHTML = `You've spent the most time on <b>${favWebsites[0][0]}</b>, <b>${favWebsites[1][0]}</b>, and <b>${favWebsites[2][0]}</b> today!`;
+              }
               break;
           }
         }
