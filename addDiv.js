@@ -35,6 +35,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           document.body.appendChild(div); // Append the actual div element
 
           addGraphs(); // Add the graphs to the overlay
+          addDraggingListeners() // adds the dragging listeners to the stats menu
           
           // Image and click event set-up:
           const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
@@ -380,6 +381,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       }
     }
   }
+
+  // ************************************************************************************************
+  // Menu Dragging
+  // ************************************************************************************************
+
+  function addDraggingListeners() {
+    const statsMenu = shadowRoot.getElementById('statsMenu');
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    statsMenu.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        offsetX = e.clientX - statsMenu.getBoundingClientRect().left;
+        offsetY = e.clientY - statsMenu.getBoundingClientRect().top;
+        statsMenu.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            statsMenu.style.left = `${e.clientX - offsetX}px`;
+            statsMenu.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+        statsMenu.style.cursor = 'move';
+    });
+  }
+
+  // ************************************************************************************************
+  // Graph Functionality
+  // ************************************************************************************************
 
   function addGraphs() {
     let weekChartDate = [];
