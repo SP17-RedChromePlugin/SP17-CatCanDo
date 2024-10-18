@@ -5,7 +5,7 @@
   "version": "1.0",
   "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
   "action": {
-    "default_icon": "images/logo.png"
+    "default_icon": "images/cattrackerlogo128.png"
   },
   "background": {
     "service_worker": "background.js"
@@ -16,6 +16,12 @@
       "js": ["lib/Chart.min.js","addDiv.js"]
     }
   ],
+  "icons": {
+    "16": "images/cattrackerlogo16.png",
+    "32": "images/cattrackerlogo32.png",
+    "48": "images/cattrackerlogo48.png",
+    "128": "images/cattrackerlogo128.png"
+  },
   "web_accessible_resources": [
     {
       "resources": [
