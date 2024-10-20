@@ -168,13 +168,21 @@ function loadTimeData() {
       result.currentDay = new Date(result.currentDay);
       console.log("Previous day, ", result.currentDay);
       console.log("Current day, ", currentDay);
+      let currentDayAsDay = currentDay.getDay();
+      if (currentDayAsDay < result.currentDay.getDay()) { //Adding 7 if the current day has looped over past 6 to prevent errors in the below for loop
+        currentDayAsDay += 7;
+      }
 
       if (result.currentDay instanceof Date && !isNaN(result.currentDay) && result.currentDay.getDay() != currentDay.getDay()) {
         console.log("New day, resetting time data");
         //If there are multiple days in between result.currentDay and currentDay, set the totalTimeEachDay object to null
-        for (let day = result.currentDay.getDay() + 1; day < currentDay.getDay(); day++) {
-          console.log("User was not logged in on day ", day);
-          totalTimeEachDay[day] = {};
+        for (let day = result.currentDay.getDay() + 1; day < currentDayAsDay; day++) {
+          let dayToReset = day;
+          if (day > 6) {
+            dayToReset -= 7;
+          }
+          console.log("User was not logged in on day ", dayToReset);
+          totalTimeEachDay[dayToReset] = {};
         }
         totalTimeEachDay[result.currentDay.getDay()] = totalTime;
         totalTime = {};
