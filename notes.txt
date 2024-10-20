@@ -1,9 +1,6 @@
-json must have different sized icons:
-"icons": {
-    "16": "images/icon-16.png",
-    "32": "images/icon-32.png",
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
-  }
-
 cd . > newfile.filetype
+
+things to add:
+settings menu
+blacklisted websites to track
+better dialogue
