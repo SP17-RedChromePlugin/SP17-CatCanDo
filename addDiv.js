@@ -449,14 +449,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
         //console.log("week Domain Keys: ", Object.keys(weekDomainTime));
         //console.log("week Domain Values: ", Object.values(weekDomainTime));
 
+        //Sorting weekChartDate so that the ending value is the current day
+        let currentDate = new Date();
+        let currentDay = currentDate.getDay();
+        weekChartDate = weekChartDate.slice(currentDay + 1).concat(weekChartDate.slice(0, currentDay + 1));
+        //Creating a new array for the days of the week that aligns with weekChartDate
+        let daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let daysOfWeekOrdered = daysOfWeek.slice(currentDay + 1).concat(daysOfWeek.slice(0, currentDay + 1));
+        //If the max value in weekChartDate is less than 1, multiply each value by 60 to convert to minutes
+        labelForGraph = 'Hours';
+        if (Math.max(...weekChartDate) < 1) { //The ... is the spread operator I just learned!
+          weekChartDate = weekChartDate.map((value) => value * 60);
+          labelForGraph = 'Minutes';
+        }
+
         // Create the charts
         const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
         const weekChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                labels: daysOfWeekOrdered,
                 datasets: [{
-                    label: 'Hours',
+                    label: labelForGraph,
                     data: weekChartDate,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
