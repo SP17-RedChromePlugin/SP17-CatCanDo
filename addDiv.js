@@ -1,6 +1,7 @@
 // Listen for messages from the background script
 let stateChangeTimeout = null;
 let shadowRoot = null;
+let currentScaling = 1;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fires when a chrome message is sent
     if (message.action === 'addDiv') {
 
@@ -35,7 +36,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           document.body.appendChild(div); // Append the actual div element
 
           addGraphs(); // Add the graphs to the overlay
-          addDraggingListeners() // adds the dragging listeners to the stats menu
+          addDraggingListeners('statsMenu', 'statsInterior'); // adds the dragging listeners to the stats menu
+          addDraggingListeners('settingsMenu', 'settingsInterior');
           
           // Image and click event set-up:
           const catPet = shadowRoot.getElementById('catImage'); //getting and setting image of the cat
@@ -60,8 +62,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           calendarButton.src = chrome.runtime.getURL('images/calenderButton1.png');
           calendarButton.addEventListener('click', statsMenu);
 
-          const settingsMenuDiv = shadowRoot.getElementById('statsMenu');
+          const settingsMenuDiv = shadowRoot.getElementById('settingsMenu');
           settingsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
+
+          const statsMenuDiv = shadowRoot.getElementById('statsMenu');
+          statsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
+
+          //Setting Menu Variables
+          const overlayDiv = shadowRoot.getElementById('overlayDiv');
+          const divScaler = shadowRoot.getElementById('divScaling');
+          divScaler.addEventListener("mouseup", (event) => {
+            currentScaling = divScaler.value / 100
+            overlayDiv.style.transform = `scale(${currentScaling})`;
+          });
 
           // Time stats
           const listElement = shadowRoot.getElementById('time-list'); // The list in overlay.html
@@ -99,7 +112,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   let menuOpen = false;
   function toggleMenu() {
     const menu = shadowRoot.getElementById('catMenu');
-    const settingsMenu = shadowRoot.getElementById('statsMenu');
+    const settingsMenuD = shadowRoot.getElementById('settingsMenu');
+    const statisticsMenuD = shadowRoot.getElementById('statsMenu');
     if (menu) {
       if (menu.style.display === 'none') { 
         menu.style.display = 'flex';
@@ -109,8 +123,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
         menu.style.display = 'none'
         menuOpen = false;
       }
-      if (settingsMenu) {
-        settingsMenu.style.display = 'none';
+      if (settingsMenuD) {
+        settingsMenuD.style.display = 'none';
+      }
+      if (statisticsMenuD) {
+        statisticsMenuD.style.display = 'none';
       }
     }
   }
@@ -162,8 +179,51 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     }
   }
 
+  let animationIntervalSet = null;
   function settingsMenu() {
-    console.log("Settings clicked!!!!");
+    const menu = shadowRoot.getElementById('settingsMenu');
+    const settingInterior = shadowRoot.getElementById('settingsInterior');
+    if (menu) {
+      if (menu.style.display === 'none') { 
+
+        if (animationIntervalSet) {
+          clearInterval(animationIntervalSet);
+        }
+
+        let positionY = 400;
+        var delta = 10;
+        const initialPos = positionY;
+        const initialDelta = delta;
+        const rateOfDecay = 1 / (1 - (initialDelta/initialPos));
+        menu.style.backgroundPosition = `center ${positionY}px`;
+        menu.style.display = 'flex';
+        settingInterior.style.display = 'none';
+
+        animationIntervalSet = setInterval(() => {
+          positionY -= delta;
+          delta /= rateOfDecay;
+          
+          //apply the updated background position
+          menu.style.backgroundPosition = `center ${positionY}px`;
+          
+          // stop the animation once the background reaches the center (0px)
+          if (positionY <= 2) {
+            menu.style.backgroundPosition = `center 0px`;
+            settingInterior.style.display = 'flex';
+            if (animationIntervalSet) {
+              clearInterval(animationIntervalSet);
+            }
+          }
+        }, 3);  // interval speed in ms
+      }
+      else { 
+        if (animationIntervalSet) {
+          clearInterval(animationIntervalSet);
+          animationIntervalSet = null;  // reset interval ID
+        }
+        menu.style.display = 'none';
+      }
+    }
   }
 
   // ************************************************************************************************
@@ -386,16 +446,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   // Menu Dragging
   // ************************************************************************************************
 
-  function addDraggingListeners() {
-    const statsMenu = shadowRoot.getElementById('statsMenu');
+  function addDraggingListeners(menu, interior) {
+    const statsMenu = shadowRoot.getElementById(menu);
+    const statsInterior = shadowRoot.getElementById(interior);
     let isDragging = false;
+    let isMouseOverInterior = false;
     let offsetX, offsetY;
 
+    statsInterior.addEventListener('mouseenter', function() {
+      isMouseOverInterior = true;
+      statsMenu.style.cursor = 'auto';
+    });
+
+    statsInterior.addEventListener('mouseleave', function() {
+      isMouseOverInterior = false;
+    });
+
     statsMenu.addEventListener('mousedown', function(e) {
-        isDragging = true;
-        offsetX = e.clientX - statsMenu.getBoundingClientRect().left;
-        offsetY = e.clientY - statsMenu.getBoundingClientRect().top;
-        statsMenu.style.cursor = 'grabbing';
+      if (!isMouseOverInterior) {
+          isDragging = true;
+          offsetX = e.clientX - statsMenu.getBoundingClientRect().left;
+          offsetY = e.clientY - statsMenu.getBoundingClientRect().top;
+          statsMenu.style.cursor = 'grabbing';
+      }
     });
 
     document.addEventListener('mousemove', function(e) {
@@ -407,7 +480,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
 
     document.addEventListener('mouseup', function() {
         isDragging = false;
-        statsMenu.style.cursor = 'move';
+        statsMenu.style.cursor = 'auto';
     });
   }
 

@@ -125,11 +125,13 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 
 //If a message is received, this function runs
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'getTotalTime') {
-    sendResponse(totalTime); // Send the totalTime object as the response
-  }
-  if (message.action === 'getTotalTimeEachDay') {
-    sendResponse(totalTimeEachDay); // Send the totalTimeEachDay object as the response
+  switch (message.action) {
+    case 'getTotalTime':
+      sendResponse(totalTime);
+      break;
+    case 'getTotalTimeEachDay':
+      sendResponse(totalTimeEachDay);
+      break;
   }
 });
 
