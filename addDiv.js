@@ -452,35 +452,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
     let isDragging = false;
     let isMouseOverInterior = false;
     let offsetX, offsetY;
-
+  
     statsInterior.addEventListener('mouseenter', function() {
       isMouseOverInterior = true;
       statsMenu.style.cursor = 'auto';
     });
-
+  
     statsInterior.addEventListener('mouseleave', function() {
       isMouseOverInterior = false;
     });
-
+  
     statsMenu.addEventListener('mousedown', function(e) {
       if (!isMouseOverInterior) {
-          isDragging = true;
-          offsetX = e.clientX - statsMenu.getBoundingClientRect().left;
-          offsetY = e.clientY - statsMenu.getBoundingClientRect().top;
-          statsMenu.style.cursor = 'grabbing';
+        isDragging = true;
+        const rect = statsMenu.getBoundingClientRect();
+  
+        offsetX = (e.clientX - rect.left) / currentScaling;
+        offsetY = (rect.bottom - e.clientY) / currentScaling;
+        console.log(`offsetY: ${offsetY}, rect.bottom: ${rect.bottom}, e.clientY: ${e.clientY}, currentScaling: ${currentScaling}`);
+  
+        statsMenu.style.cursor = 'grabbing';
       }
     });
-
+  
     document.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-            statsMenu.style.left = `${e.clientX - offsetX}px`;
-            statsMenu.style.top = `${e.clientY - offsetY}px`;
-        }
+      if (isDragging) {
+        const adjustedClientY = e.clientY / currentScaling;
+        const adjustedClientX = e.clientX / currentScaling;
+  
+        statsMenu.style.left = `${adjustedClientX - offsetX}px`;
+        statsMenu.style.bottom = `${(window.innerHeight / currentScaling) - adjustedClientY - offsetY}px`;
+      }
     });
-
+  
     document.addEventListener('mouseup', function() {
-        isDragging = false;
-        statsMenu.style.cursor = 'auto';
+      isDragging = false;
+      statsMenu.style.cursor = 'auto';
     });
   }
 
