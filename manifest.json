@@ -38,7 +38,8 @@
         "images/catwalkinggif.gif",
         "images/catsleepinggif.gif",
         "images/sleepingZ.png",
-        "images/htmlbackground.png"
+        "images/htmlbackground.png",
+        "images/cathappy.png"
       ],
       "matches": ["<all_urls>", "chrome-extension://*/*"]
     }

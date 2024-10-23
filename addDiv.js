@@ -2,6 +2,7 @@
 let stateChangeTimeout = null;
 let shadowRoot = null;
 let currentScaling = 1;
+let currentState = 'sitting';
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fires when a chrome message is sent
     if (message.action === 'addDiv') {
 
@@ -242,12 +243,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       
       switch (newState) {
         case 0:
+          currentState = 'sleeping';
           sleepState(randomDelay);
           break;
         case 1:
+          currentState = 'walking';
           walkState();
           break;
         case 2:
+          currentState = 'sitting';
           sitState();
           break;
       }
@@ -332,7 +336,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       positionX += step * direction; // Move the cat in the chosen direction
 
       // Check if the cat moves off-screen and reverse its direction
-      if (positionX > window.innerWidth - catPet.offsetWidth || positionX < 0) {
+      if (positionX > (window.innerWidth - catPet.offsetWidth) / currentScaling || positionX < 0) {
         console.log(`PositionX: ${positionX}, WindowWidth: ${window.innerWidth}, CatWidth: ${catPet.offsetWidth}`);
         clearInterval(animationInterval); // Stop the animation
         walkState(); // Restart with a new direction
@@ -372,6 +376,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   function catClicked() {
     //end any active animation
     endAnimation();
+    currentState = 'sitting';
 
     const speechBubble = shadowRoot.getElementById('speechBubble');
     if (speechBubbleTimeoutId) { //Clear timeout and hide speech bubble
@@ -428,7 +433,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
   }
 
   function catHovered(isHovering) {
-    console.log("hover: ", isHovering)
+    if (currentState === 'sitting') {
+      const catPet = shadowRoot.getElementById('catImage');
+      if (isHovering) {
+        catPet.src = chrome.runtime.getURL('images/cathappy.png');
+      } else {
+        catPet.src = chrome.runtime.getURL('images/catsitting.png');
+      }
+    }
   }
 
   function showMenu(isOpen) {
