@@ -32,8 +32,6 @@ chrome.action.onClicked.addListener(async (tab) => {
 ---Time tracking---
 */
 
-let activeURL = null;
-let timeSpent = {};
 let tabDomains = {}; // Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
 let totalTime = {}; //Stores total time spent on a website
