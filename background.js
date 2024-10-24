@@ -99,6 +99,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
       tabStartTimes[details.tabId] = currentDate;
       totalTimeEachDay[currentDay.getDay()] = totalTime;
       console.log("Time spent on that website: ", totalTime[currentDomain]);
+      saveTimeData();
     }
   }
 });

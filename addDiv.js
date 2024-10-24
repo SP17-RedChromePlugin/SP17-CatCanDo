@@ -555,6 +555,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           labelForGraph = 'Minutes';
         }
 
+        //Update cumulative time
+        const cumTimeDisplay = shadowRoot.getElementById('cumulWeekTime');
+        let cumTime = 0;
+        for (let time of weekChartDate) {
+          cumTime += time;
+        }
+        cumTime = Math.round(cumTime*100)/100;
+        cumTimeDisplay.innerHTML = `Cumulative time: ${cumTime} ${labelForGraph}`;
+
         // Create the charts
         const ctx = shadowRoot.getElementById('weekChartCanvas').getContext('2d');
         const weekChart = new Chart(ctx, {
