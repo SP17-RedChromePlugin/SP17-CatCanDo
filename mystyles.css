@@ -8,7 +8,7 @@ body { background-color:#e2fcf6;
            max-width: 1024px;
            margin-right: auto;
            margin-left: auto;
-           background-color:#6ca6b3;
+           background-color:#2b8660;
            box-shadow: 3px 3px 3px #666666;
 }
 header { background-color: #1f2322;
@@ -32,9 +32,9 @@ nav { font-weight: bold;
      padding: 20px 5px 0 20px;
 }
 nav a { text-decoration: none; }
-nav a:link { color: #38761d; }
-nav a:visited { color: #38761d }
-nav a:hover { color: #6aa84f; }
+nav a:link { color: #a3e9d8; }
+nav a:visited { color: #a3e9d8 }
+nav a:hover { color: #e2fcf6; }
 nav ul { list-style-type: none;
        margin: 0;
        padding-left: 0;
