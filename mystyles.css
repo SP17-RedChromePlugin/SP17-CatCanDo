@@ -8,10 +8,10 @@ body { background-color:#e2fcf6;
            max-width: 1024px;
            margin-right: auto;
            margin-left: auto;
-           background-color:#a3e9d8;
+           background-color:#6ca6b3;
            box-shadow: 3px 3px 3px #666666;
 }
-header { background-color: #134f5c;
+header { background-color: #1f2322;
          color: #000000;
        font-family: Arial, helvetica;;
 }
@@ -22,8 +22,8 @@ h1 { line-height: 200%;
     padding-left: 20px;
     height: 72px;
     margin-bottom: 0;
-background-color:#134f5c;
-color:#000000;
+background-color:#1f2322;
+color:#ffffff;
 }
 nav { font-weight: bold;
      padding: 5px;
