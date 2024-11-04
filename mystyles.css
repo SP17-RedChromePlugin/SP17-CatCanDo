@@ -1,6 +1,6 @@
 body { background-color:#e2fcf6;
       background-image: url(images/catBackground.png);
-      color: #000000;
+      color: #e2fcf6;
       font-family: Arial, helvetica;;
 }
 #wrapper { width: 80%;
@@ -11,8 +11,8 @@ body { background-color:#e2fcf6;
            background-color:#a3e9d8;
            box-shadow: 3px 3px 3px #666666;
 }
-header { background-color: #231F20;
-         color: #ffffff;
+header { background-color: #134f5c;
+         color: #134f5c;
        font-family: Arial, helvetica;;
 }
 h1 { line-height: 200%;
@@ -32,9 +32,9 @@ nav { font-weight: bold;
      padding: 20px 5px 0 20px;
 }
 nav a { text-decoration: none; }
-nav a:link { color: #36c29f91; }
-nav a:visited { color: #104b3ccb }
-nav a:hover { color: #FFFFFF; }
+nav a:link { color: #38761d; }
+nav a:visited { color: #38761d }
+nav a:hover { color: #6aa84f; }
 nav ul { list-style-type: none;
        margin: 0;
        padding-left: 0;
