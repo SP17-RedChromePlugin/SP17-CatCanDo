@@ -1,5 +1,5 @@
-body { background-color:#FFC425;
-      background-image: url(background.jpg);
+body { background-color:#e2fcf6;
+      background-image: url(images/catBackground.png);
       color: #000000;
       font-family: Arial, helvetica;;
 }
@@ -8,7 +8,7 @@ body { background-color:#FFC425;
            max-width: 1024px;
            margin-right: auto;
            margin-left: auto;
-           background-color:#55aa55;
+           background-color:#a3e9d8;
            box-shadow: 3px 3px 3px #666666;
 }
 header { background-color: #231F20;
@@ -32,8 +32,8 @@ nav { font-weight: bold;
      padding: 20px 5px 0 20px;
 }
 nav a { text-decoration: none; }
-nav a:link { color: #000033; }
-nav a:visited { color: #344873 }
+nav a:link { color: #36c29f91; }
+nav a:visited { color: #104b3ccb }
 nav a:hover { color: #FFFFFF; }
 nav ul { list-style-type: none;
        margin: 0;
