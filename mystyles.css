@@ -34,7 +34,7 @@ nav { font-weight: bold;
 nav a { text-decoration: none; }
 nav a:link { color: #f0faf3; }
 nav a:visited { color: #f0faf3 }
-nav a:hover { color: #cfe4d5; }
+nav a:hover { color: #cfe1e4; }
 nav ul { list-style-type: none;
        margin: 0;
        padding-left: 0;
