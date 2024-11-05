@@ -71,3 +71,20 @@ main img { float: left;
 main ul { list-style-position: inside; }
 .clear { clear: both; }
 header, nav, main, footer { display: block; }
+
+/*
+Silly Hover Code
+*/
+
+.hover {
+    animation: MoveUpDown 4s ease-in-out infinite;
+}
+
+@keyframes MoveUpDown {
+    0%, 100% {
+        transform: translateY(10px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
