@@ -69,6 +69,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
           const statsMenuDiv = shadowRoot.getElementById('statsMenu');
           statsMenuDiv.style.backgroundImage = `url(${chrome.runtime.getURL('images/catmenu.png')})`;
 
+          shadowRoot.getElementById('addAlarmButton').addEventListener('click', function() { //Adding alarm button functionality
+            const name = shadowRoot.getElementById('fnewalarmname').value;
+            const date = shadowRoot.getElementById('fnewalarmdate').value;
+            const time = shadowRoot.getElementById('fnewalarmtime').value;
+            chrome.runtime.sendMessage({ action: 'addAlarm', name: name, date: date, time: time});
+          });
+
           //Setting Menu Variables
           const overlayDiv = shadowRoot.getElementById('overlayDiv');
           const divScaler = shadowRoot.getElementById('divScaling');
@@ -106,6 +113,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       clearTimeout(stateChangeTimeout);
       if (div) {
         div.remove();
+      }
+    } else if (message.action === 'updateAlarmVisual') { //updates alarms list in settings
+      let listElement = shadowRoot.getElementById('alarm-list');
+      listElement.innerHTML = '';
+      for (let alarm in message.alarms) {
+        let alarmElement = document.createElement('li');
+        alarmElement.textContent = `${alarm} - ${message.alarms[alarm]}`; //TO DO: Format the date to be more user-friendly
+        listElement.appendChild(alarmElement);
       }
     }
   });

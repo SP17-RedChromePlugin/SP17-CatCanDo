@@ -29,14 +29,16 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 /*
----Time tracking---
+---Time tracking and alarms---
 */
 
-let tabDomains = {}; // Store tab domain information
+let tabDomains = {}; //Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
 let totalTime = {}; //Stores total time spent on a website
 let totalTimeEachDay = {}; //Stores the totalTime object for each day, for a week. Will have seven objects, one for each day of the week
 let currentDay = null; //Stores the current date
+
+let alarms = {}; //Stores the alarms set by the user
 
 //Postprocess domain names
 function processDomain(input) {
@@ -130,6 +132,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getTotalTimeEachDay':
       sendResponse(totalTimeEachDay);
+      break;
+    case 'addAlarm':
+      let alarmName = message.name;
+      let alarmDate = message.date;
+      let alarmTime = message.time;
+      console.log(`Alarm ${alarmName} set for ${alarmDate} at ${alarmTime}`);
+      let alarmDateTime = new Date(alarmDate + 'T' + alarmTime);
+      alarms[alarmName] = alarmDateTime;
+
+      // send a message back to the content script
+      if (sender.tab && sender.tab.id) {
+        chrome.tabs.sendMessage(sender.tab.id, { action: 'updateAlarmVisual', alarms: alarms });
+      }
       break;
   }
 });
