@@ -1,15 +1,18 @@
-// Listen for messages from the background script
 let stateChangeTimeout = null;
 let shadowRoot = null;
 let currentScaling = 1;
 let currentState = 'sitting';
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fires when a chrome message is sent
+
+// ************************************************************************************************
+// Event Listener for messages from the background script
+// ************************************************************************************************
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'addDiv') {
 
       //Cat state deciding loop
       executeStateChange();
       
-      // Create a div with full-screen overlay
+      //Create a div with full-screen overlay
       const existingDiv = document.getElementById('overlayDiv')
       if (!existingDiv) {
         fetch(chrome.runtime.getURL('overlay.html'))
@@ -76,6 +79,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
             chrome.runtime.sendMessage({ action: 'addAlarm', name: name, date: date, time: time});
           });
 
+          shadowRoot.getElementById('resetButton').addEventListener('click', function() {
+            chrome.runtime.sendMessage({ action: 'clearSaveData' });
+          });
+
           //Setting Menu Variables
           const overlayDiv = shadowRoot.getElementById('overlayDiv');
           const divScaler = shadowRoot.getElementById('divScaling');
@@ -119,7 +126,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //Fire
       listElement.innerHTML = '';
       for (let alarm in message.alarms) {
         let alarmElement = document.createElement('li');
-        alarmElement.textContent = `${alarm} - ${message.alarms[alarm]}`; //TO DO: Format the date to be more user-friendly
+        let alarmDate = new Date(message.alarms[alarm]);
+        let alarmYear = alarmDate.getFullYear();
+        let alarmMonth = alarmDate.getMonth();
+        let alarmDay = alarmDate.getDate();
+        let alarmHour = alarmDate.getHours();
+        let alarmPartOfDay = 'AM';
+        if (alarmHour > 12) {
+          alarmHour -= 12;
+          alarmPartOfDay = 'PM';
+        }
+        let alarmMinute = alarmDate.getMinutes();
+        alarmElement.textContent = `${alarm}: ${alarmHour}:${alarmMinute} ${alarmPartOfDay},${alarmMonth}/${alarmDay}/${alarmYear}`;
         listElement.appendChild(alarmElement);
       }
     }

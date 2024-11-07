@@ -146,39 +146,54 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.tabs.sendMessage(sender.tab.id, { action: 'updateAlarmVisual', alarms: alarms });
       }
       break;
+    case 'clearSaveData':
+      totalTime = {};
+      totalTimeEachDay = {};
+      saveTimeData();
+      break;
   }
 });
 
 function saveTimeData() {
-  //totalTime = {}; //to clear data
+
   if (totalTime['newtab']) {
     delete totalTime['newtab'];
   }
+
   chrome.storage.local.set({ totalTime: totalTime }, function() {
       console.log('Time spent data saved', totalTime);
   });
+  
   chrome.storage.local.set({ currentDay: currentDay.toISOString() }, function() {
     console.log('Current day saved', currentDay);
   });
+
   chrome.storage.local.set({ totalTimeEachDay: totalTimeEachDay }, function() {
     console.log('Time spent each day for past week saved', totalTimeEachDay);
+  });
+
+  chrome.storage.local.set({ alarms: alarms }, function() {
+    console.log('Alarms saved', alarms);
   });
 }
 
 function loadTimeData() {
   currentDay = new Date();
+
   chrome.storage.local.get('totalTime', function(result) {
       if (result.totalTime) {
         totalTime = result.totalTime;
         console.log("TotalTime, ", totalTime);
       }
   });
+
   chrome.storage.local.get('totalTimeEachDay', function(result) {
     if (result.totalTimeEachDay) {
       totalTimeEachDay = result.totalTimeEachDay;
       console.log("TotalTimeEachDay, ", totalTimeEachDay);
     }
   });
+
   chrome.storage.local.get('currentDay', function(result) {
     if (result.currentDay) {
       result.currentDay = new Date(result.currentDay);
@@ -205,6 +220,13 @@ function loadTimeData() {
         console.log("New totalTimeEachDay, ", totalTimeEachDay);
         console.log("New totalTime, ", totalTime);
       }
+    }
+  });
+
+  chrome.storage.local.get('alarms', function(result) {
+    if (result.alarms) {
+      alarms = result.alarms;
+      console.log("Alarms, ", alarms);
     }
   });
 }
