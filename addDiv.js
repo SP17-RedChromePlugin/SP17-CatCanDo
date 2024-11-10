@@ -3,6 +3,8 @@ let shadowRoot = null;
 let currentScaling = 1;
 let currentState = 'sitting';
 
+let speechBubbleTimeoutId = null;
+
 // ************************************************************************************************
 // Event Listener for messages from the background script
 // ************************************************************************************************
@@ -143,10 +145,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       alarmElement.textContent = `${alarm}: ${alarmHour}:${alarmMinute} ${alarmPartOfDay},${alarmMonth}/${alarmDay}/${alarmYear}`;
       listElement.appendChild(alarmElement);
     }
-  } else if (message.action === 'setOffAlarm') {
+  } else if (message.action === 'setOffAlarm') { //------------------Alarm Display
     const alarmName = message.alarmName;
-    alert(`Alarm ${alarmName} has gone off!`);
-    chrome.runtime.sendMessage({ action: 'addAlarm', isadding: false});
+
+    if (shadowRoot.getElementById('catImage')) {
+      sitState();
+
+      const speechBubble = shadowRoot.getElementById('speechBubble');
+      if (speechBubbleTimeoutId) { //Clear timeout and hide speech bubble
+        clearTimeout(speechBubbleTimeoutId);
+        speechBubbleTimeoutId = null;
+        speechBubble.style.display = 'none';
+      }
+  
+      speechBubble.style.display = 'block';
+      speechBubble.innerHTML = `Meow! Your alarm "${alarmName}" has gone off!`;
+  
+      speechBubbleTimeoutId = setTimeout(() => {
+        speechBubble.style.display = 'none';
+      }, 60000);
+      chrome.runtime.sendMessage({ action: 'addAlarm', isadding: false});
+    } else {
+      alert(`Alarm ${alarmName} has gone off!`);
+    }
   }
 });
 
@@ -291,7 +312,6 @@ function executeStateChange() {
         walkState();
         break;
       case 2:
-        currentState = 'sitting';
         sitState();
         break;
     }
@@ -389,6 +409,10 @@ function walkState() {
 }
 
 function sitState() {
+  currentState = 'sitting';
+  endAnimation();
+  const catPetImage = shadowRoot.getElementById('catImage');
+  catPetImage.src = chrome.runtime.getURL('images/catsitting.png');
   console.log("Cat is sitting.");
 }
 
@@ -412,7 +436,6 @@ function endAnimation(){
 // Cat interaction
 // ************************************************************************************************
 
-let speechBubbleTimeoutId = null;
 function catClicked() {
   //end any active animation
   endAnimation();
