@@ -143,6 +143,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       alarmElement.textContent = `${alarm}: ${alarmHour}:${alarmMinute} ${alarmPartOfDay},${alarmMonth}/${alarmDay}/${alarmYear}`;
       listElement.appendChild(alarmElement);
     }
+  } else if (message.action === 'setOffAlarm') {
+    const alarmName = message.alarmName;
+    alert(`Alarm ${alarmName} has gone off!`);
+    chrome.runtime.sendMessage({ action: 'addAlarm', isadding: false});
   }
 });
 

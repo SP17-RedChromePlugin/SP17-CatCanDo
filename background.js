@@ -1,3 +1,5 @@
+let currentPageCatActivated = null;
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.setBadgeText({
     text: 'OFF'
@@ -127,6 +129,8 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 
 //If a message is received, this function runs
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  currentPageCatActivated = sender;
+  console.log("SENDER HAS BEEN SAVED UIPPEEE");
   switch (message.action) {
     case 'getTotalTime':
       sendResponse(totalTime);
@@ -254,23 +258,31 @@ let timeOutUntilNextAlarm = null;
 function alarmTimeCheck() {
   let currentTime = new Date();
   let smallestDifference = Number.MAX_VALUE;
+  let currentAlarmName = null;
   for (let alarm in alarms) {
     let difference = alarms[alarm] - currentTime;
     if (difference <= 0) {
-      delete alarms[alarm];
-      //Set alarm off
-      saveTimeData();
+      currentAlarmName = alarm;
+      setAlarmOff(currentAlarmName);
     }
     else if (difference < smallestDifference) {
+      currentAlarmName = alarm;
       smallestDifference = difference;
     }
   }
 
+  timeOutUntilNextAlarm = setTimeout(() => {
+    setAlarmOff(currentAlarmName);
+  }, smallestDifference);
+}
+
+function setAlarmOff(alarmName) {
+  console.log("ALARM WENT OFF!!!");
   if (timeOutUntilNextAlarm) {
     clearTimeout(timeOutUntilNextAlarm);
   }
-  timeOutUntilNextAlarm = setTimeout(() => {
-    alarmTimeCheck();
-    //set alarm off
-  }, smallestDifference);
+  delete alarms[alarmName];
+  saveTimeData();
+  chrome.tabs.sendMessage(currentPageCatActivated.tab.id, { action: 'setOffAlarm', alarmName: alarmName});
+  alarmTimeCheck();
 }
