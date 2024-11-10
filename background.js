@@ -22,15 +22,16 @@ chrome.action.onClicked.addListener(async (tab) => {
 
     if (nextState === 'ON') {
       chrome.tabs.sendMessage(tab.id, { action: 'addDiv' });
+      alarmTimeCheck();
     } else if (nextState === 'OFF') {
       chrome.tabs.sendMessage(tab.id, { action: 'removeDiv' });
     }
   }
 });
 
-/*
----Time tracking and alarms---
-*/
+// ************************************************************************************************
+// Time Tracking and Alarms
+// ************************************************************************************************
 
 let tabDomains = {}; //Store tab domain information
 let tabStartTimes = {}; //Stores time that the tab was opened
@@ -134,17 +135,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse(totalTimeEachDay);
       break;
     case 'addAlarm':
-      let alarmName = message.name;
-      let alarmDate = message.date;
-      let alarmTime = message.time;
-      console.log(`Alarm ${alarmName} set for ${alarmDate} at ${alarmTime}`);
-      let alarmDateTime = new Date(alarmDate + 'T' + alarmTime);
-      alarms[alarmName] = alarmDateTime;
-
+      if (message.isadding) {
+        let alarmName = message.name;
+        let alarmDate = message.date;
+        let alarmTime = message.time;
+        console.log(`Alarm ${alarmName} set for ${alarmDate} at ${alarmTime}`);
+        let alarmDateTime = new Date(alarmDate + 'T' + alarmTime);
+        alarms[alarmName] = alarmDateTime;
+      }
       // send a message back to the content script
       if (sender.tab && sender.tab.id) {
         chrome.tabs.sendMessage(sender.tab.id, { action: 'updateAlarmVisual', alarms: alarms });
       }
+      alarmTimeCheck();
       break;
     case 'clearSaveData':
       totalTime = {};
@@ -172,8 +175,14 @@ function saveTimeData() {
     console.log('Time spent each day for past week saved', totalTimeEachDay);
   });
 
-  chrome.storage.local.set({ alarms: alarms }, function() {
-    console.log('Alarms saved', alarms);
+  //Converting date variable to string so that Chrome Storage API will properly store it
+  const alarmsToSave = {};
+  for (const [key, value] of Object.entries(alarms)) {
+    alarmsToSave[key] = value.toISOString();
+  }
+
+  chrome.storage.local.set({ alarms: alarmsToSave }, function() {
+    console.log('Alarms saved', alarmsToSave);
   });
 }
 
@@ -225,7 +234,10 @@ function loadTimeData() {
 
   chrome.storage.local.get('alarms', function(result) {
     if (result.alarms) {
-      alarms = result.alarms;
+      alarms = {};
+      for (const [key, value] of Object.entries(result.alarms)) {
+        alarms[key] = new Date(value);
+      }
       console.log("Alarms, ", alarms);
     }
   });
@@ -233,3 +245,32 @@ function loadTimeData() {
 
 // Load data on extension start
 loadTimeData();
+
+// ************************************************************************************************
+// Alarm Notifications
+// ************************************************************************************************
+
+let timeOutUntilNextAlarm = null;
+function alarmTimeCheck() {
+  let currentTime = new Date();
+  let smallestDifference = Number.MAX_VALUE;
+  for (let alarm in alarms) {
+    let difference = alarms[alarm] - currentTime;
+    if (difference <= 0) {
+      delete alarms[alarm];
+      //Set alarm off
+      saveTimeData();
+    }
+    else if (difference < smallestDifference) {
+      smallestDifference = difference;
+    }
+  }
+
+  if (timeOutUntilNextAlarm) {
+    clearTimeout(timeOutUntilNextAlarm);
+  }
+  timeOutUntilNextAlarm = setTimeout(() => {
+    alarmTimeCheck();
+    //set alarm off
+  }, smallestDifference);
+}

@@ -4,7 +4,7 @@
   "description": "Browser pet that helps manage your time on the web!",
   "version": "1.0",
   "permissions": ["tabs", "activeTab", "scripting", "storage", "webNavigation", "windows"],
-  "host_permissions": ["<all_urls>", "chrome-extension://*/*"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_icon": "images/cattrackerlogo128.png"
   },
