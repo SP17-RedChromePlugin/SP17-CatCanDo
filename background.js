@@ -158,6 +158,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       totalTimeEachDay = {};
       saveTimeData();
       break;
+    case 'deleteAlarm':
+      let alarmToRemove = message.name;
+      delete alarms[alarmToRemove];
+      saveTimeData();
+      break;
   }
 });
 

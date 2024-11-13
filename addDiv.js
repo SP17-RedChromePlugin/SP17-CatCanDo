@@ -129,7 +129,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === 'updateAlarmVisual') { //updates alarms list in settings
     let listElement = shadowRoot.getElementById('alarm-list');
     listElement.innerHTML = '';
+
     for (let alarm in message.alarms) {
+      let alarmContainer = document.createElement('div');
+      alarmContainer.style.display = 'flex';
+      alarmContainer.style.justifyContent = 'space-between';
+
       let alarmElement = document.createElement('li');
       let alarmDate = new Date(message.alarms[alarm]);
       let alarmYear = alarmDate.getFullYear();
@@ -143,7 +148,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       let alarmMinute = alarmDate.getMinutes();
       alarmElement.textContent = `${alarm}: ${alarmHour}:${alarmMinute} ${alarmPartOfDay},${alarmMonth}/${alarmDay}/${alarmYear}`;
-      listElement.appendChild(alarmElement);
+      alarmContainer.appendChild(alarmElement);
+      
+      let deleteButton = document.createElement('button');
+      deleteButton.style.backgroundColor = 'red';
+      deleteButton.style.marginLeft = '10px';
+      deleteButton.textContent = 'X';
+      deleteButton.addEventListener('click', function() {
+        chrome.runtime.sendMessage({ action: 'deleteAlarm', name: alarm });
+        alarmContainer.remove();
+      });
+      alarmContainer.appendChild(deleteButton);
+
+      listElement.appendChild(alarmContainer);
     }
   } else if (message.action === 'setOffAlarm') { //------------------Alarm Display
     const alarmName = message.alarmName;
