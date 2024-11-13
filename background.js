@@ -271,9 +271,11 @@ function alarmTimeCheck() {
     }
   }
 
-  timeOutUntilNextAlarm = setTimeout(() => {
-    setAlarmOff(currentAlarmName);
-  }, smallestDifference);
+  if (currentAlarmName != null) {
+    timeOutUntilNextAlarm = setTimeout(() => {
+      setAlarmOff(currentAlarmName);
+    }, smallestDifference);
+  }
 }
 
 function setAlarmOff(alarmName) {
