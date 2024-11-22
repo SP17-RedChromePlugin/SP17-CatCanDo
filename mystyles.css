@@ -75,7 +75,7 @@ header, nav, main, footer { display: block; }
 /*
 Silly Hover Code
 */
-
+/*
 .hover {
     animation: MoveUpDown 4s ease-in-out infinite;
 }
@@ -88,3 +88,4 @@ Silly Hover Code
         transform: translateY(-10px);
     }
 }
+*/
