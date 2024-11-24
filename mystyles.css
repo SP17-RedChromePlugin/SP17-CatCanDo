@@ -72,6 +72,10 @@ main ul { list-style-position: inside; }
 .clear { clear: both; }
 header, nav, main, footer { display: block; }
 
+.indent {
+    text-indent: 40px;
+}
+
 /*
 Silly Hover Code
 */
